@@ -3,7 +3,7 @@ name: Cloud OpenWrt
 on:
   push:
     branches:
-      - master
+      - main
     paths:
       - 'README.md'
 
@@ -24,7 +24,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
       with:
-        ref: master
+        ref: main
 
     - name: Initialization environment
       env:
@@ -95,7 +95,7 @@ jobs:
         echo "::set-output name=status::success"
 
     - name: Upload firmware directory
-      uses: actions/upload-artifact@master
+      uses: actions/upload-artifact@main
       if: steps.organize.outputs.status == 'success' && !cancelled()
       with:
         name: OpenWrt_firmware
@@ -107,7 +107,7 @@ jobs:
         name: ${{ env.DATE }} ❤️ | OpenWrt 自动编译
         allowUpdates: true
         tag: ${{ env.tag_name }}
-        commit: master
+        commit: main
         token: ${{ secrets.RELEASES_TOKEN }}
         body: |
           编译使用版本:
