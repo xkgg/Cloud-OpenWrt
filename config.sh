@@ -4,117 +4,260 @@ cat >> .config <<EOF
 CONFIG_TARGET_x86=y
 CONFIG_TARGET_x86_64=y
 CONFIG_TARGET_x86_64_DEVICE_generic=y
-CONFIG_LIBCURL_COOKIES=y
-CONFIG_LIBCURL_FILE=y
-CONFIG_LIBCURL_FTP=y
-CONFIG_LIBCURL_HTTP=y
-CONFIG_LIBCURL_MBEDTLS=y
-CONFIG_LIBCURL_NO_SMB="!"
-CONFIG_LIBCURL_PROXY=y
 CONFIG_LIBMBEDTLS_HAVE_SSE2=y
 CONFIG_LIBSODIUM_MINIMAL=y
-# CONFIG_PACKAGE_adbyby is not set
 CONFIG_PACKAGE_bash=y
 CONFIG_PACKAGE_boost=y
 CONFIG_PACKAGE_boost-date_time=y
 CONFIG_PACKAGE_boost-program_options=y
 CONFIG_PACKAGE_boost-system=y
-CONFIG_PACKAGE_ca-bundle=y
+CONFIG_PACKAGE_ca-certificates=y
 CONFIG_PACKAGE_coreutils=y
 CONFIG_PACKAGE_coreutils-base64=y
 CONFIG_PACKAGE_coreutils-nohup=y
-CONFIG_PACKAGE_curl=y
+CONFIG_PACKAGE_ip-full=y
 CONFIG_PACKAGE_ipt2socks=y
-CONFIG_PACKAGE_iptables-mod-extra=y
-# CONFIG_PACKAGE_iptables-mod-ipsec is not set
-CONFIG_PACKAGE_iptables-mod-tproxy=y
-# CONFIG_PACKAGE_kmod-crypto-cbc is not set
-# CONFIG_PACKAGE_kmod-crypto-deflate is not set
-# CONFIG_PACKAGE_kmod-crypto-des is not set
-# CONFIG_PACKAGE_kmod-crypto-echainiv is not set
-# CONFIG_PACKAGE_kmod-crypto-hmac is not set
-# CONFIG_PACKAGE_kmod-crypto-md5 is not set
-# CONFIG_PACKAGE_kmod-fast-classifier is not set
-CONFIG_PACKAGE_kmod-ip6tables=y
-# CONFIG_PACKAGE_kmod-ipsec is not set
-CONFIG_PACKAGE_kmod-ipt-extra=y
-# CONFIG_PACKAGE_kmod-ipt-ipsec is not set
-CONFIG_PACKAGE_kmod-ipt-tproxy=y
-# CONFIG_PACKAGE_kmod-iptunnel6 is not set
-CONFIG_PACKAGE_kmod-nf-ipt6=y
-CONFIG_PACKAGE_kmod-nf-reject6=y
-# CONFIG_PACKAGE_kmod-shortcut-fe is not set
-# CONFIG_PACKAGE_kmod-tcp-bbr is not set
-# CONFIG_PACKAGE_kmod-tun is not set
-CONFIG_PACKAGE_libcap=y
+CONFIG_PACKAGE_libbpf=y
 CONFIG_PACKAGE_libcap-bin=y
 CONFIG_PACKAGE_libcap-bin-capsh-shell="/bin/sh"
-CONFIG_PACKAGE_libcurl=y
 CONFIG_PACKAGE_libdb47=y
+CONFIG_PACKAGE_libelf=y
 CONFIG_PACKAGE_libev=y
 CONFIG_PACKAGE_libmaxminddb=y
 CONFIG_PACKAGE_libmbedtls=y
-# CONFIG_PACKAGE_libminiupnpc is not set
-# CONFIG_PACKAGE_libnatpmp is not set
 CONFIG_PACKAGE_libruby=y
 CONFIG_PACKAGE_libsodium=y
-CONFIG_PACKAGE_libxml2=y
+CONFIG_PACKAGE_libudns=y
 CONFIG_PACKAGE_libyaml=y
+CONFIG_PACKAGE_lua-cjson=y
 CONFIG_PACKAGE_lua-maxminddb=y
 CONFIG_PACKAGE_luasocket=y
 # CONFIG_PACKAGE_luci-app-accesscontrol is not set
 # CONFIG_PACKAGE_luci-app-adbyby-plus is not set
 # CONFIG_PACKAGE_luci-app-arpbind is not set
-# CONFIG_PACKAGE_luci-app-autoreboot is not set
 # CONFIG_PACKAGE_luci-app-ddns is not set
 # CONFIG_PACKAGE_luci-app-filetransfer is not set
 # CONFIG_PACKAGE_luci-app-ipsec-vpnd is not set
-CONFIG_PACKAGE_luci-app-openclash=y
-# CONFIG_PACKAGE_luci-app-rclone_INCLUDE_fuse-utils is not set
 # CONFIG_PACKAGE_luci-app-rclone_INCLUDE_rclone-ng is not set
 # CONFIG_PACKAGE_luci-app-rclone_INCLUDE_rclone-webui is not set
-# CONFIG_PACKAGE_luci-app-sfe is not set
+# CONFIG_PACKAGE_luci-app-ttyd is not set
+# CONFIG_PACKAGE_luci-app-turboacc is not set
+# CONFIG_PACKAGE_luci-app-turboacc_INCLUDE_BBR_CCA is not set
+# CONFIG_PACKAGE_luci-app-turboacc_INCLUDE_OFFLOADING is not set
 # CONFIG_PACKAGE_luci-app-upnp is not set
-# CONFIG_PACKAGE_luci-app-uugamebooster is not set
 # CONFIG_PACKAGE_luci-app-vsftpd is not set
 CONFIG_PACKAGE_luci-app-vssr=y
-# CONFIG_PACKAGE_luci-app-vssr_INCLUDE_ShadowsocksR_Server is not set
-# CONFIG_PACKAGE_luci-app-vssr_INCLUDE_Xray_plugin is not set
+# CONFIG_PACKAGE_luci-app-wireguard is not set
 # CONFIG_PACKAGE_luci-app-xlnetacc is not set
 # CONFIG_PACKAGE_luci-app-zerotier is not set
-# CONFIG_PACKAGE_luci-lib-fs is not set
-CONFIG_PACKAGE_luci-theme-argon=y
+CONFIG_PACKAGE_luci-i18n-vssr-zh-cn=y
 CONFIG_PACKAGE_luci-theme-opentomcat=y
-# CONFIG_PACKAGE_miniupnpd is not set
 CONFIG_PACKAGE_ruby=y
 CONFIG_PACKAGE_ruby-bigdecimal=y
 CONFIG_PACKAGE_ruby-date=y
 CONFIG_PACKAGE_ruby-dbm=y
 CONFIG_PACKAGE_ruby-digest=y
 CONFIG_PACKAGE_ruby-enc=y
+CONFIG_PACKAGE_ruby-forwardable=y
 CONFIG_PACKAGE_ruby-pstore=y
 CONFIG_PACKAGE_ruby-psych=y
 CONFIG_PACKAGE_ruby-stringio=y
 CONFIG_PACKAGE_ruby-strscan=y
 CONFIG_PACKAGE_ruby-yaml=y
+CONFIG_PACKAGE_shadowsocks-libev-config=y
 CONFIG_PACKAGE_shadowsocks-libev-ss-local=y
 CONFIG_PACKAGE_shadowsocks-libev-ss-redir=y
-CONFIG_PACKAGE_shadowsocksr-libev-alt=y
+CONFIG_PACKAGE_shadowsocksr-libev-ssr-check=y
 CONFIG_PACKAGE_shadowsocksr-libev-ssr-local=y
-CONFIG_PACKAGE_simple-obfs=y
-# CONFIG_PACKAGE_strongswan is not set
+CONFIG_PACKAGE_shadowsocksr-libev-ssr-redir=y
+CONFIG_PACKAGE_shadowsocksr-libev-ssr-server=y
+CONFIG_PACKAGE_simple-obfs-client=y
 CONFIG_PACKAGE_trojan=y
-# CONFIG_PACKAGE_uugamebooster is not set
-# CONFIG_PACKAGE_vsftpd-alt is not set
 CONFIG_PACKAGE_xray-core=y
-# CONFIG_PACKAGE_zerotier is not set
-CONFIG_TARGET_KERNEL_PARTSIZE=50
-CONFIG_TARGET_ROOTFS_PARTSIZE=300
+CONFIG_PACKAGE_xray-plugin=y
+CONFIG_TARGET_ROOTFS_PARTSIZE=180
 # CONFIG_VMDK_IMAGES is not set
-CONFIG_XRAY_CORE_COMPRESS_UPX=y
-CONFIG_XRAY_CORE_PROVIDE_V2RAY_CORE=y
 CONFIG_boost-compile-visibility-hidden=y
 CONFIG_boost-runtime-shared=y
 CONFIG_boost-static-and-shared-libs=y
 CONFIG_boost-variant-release=y
+# CONFIG_BUSYBOX_CONFIG_FEATURE_IP_LINK is not set
+# CONFIG_BUSYBOX_CONFIG_IP is not set
+CONFIG_LIBCURL_COOKIES=y
+# CONFIG_LIBCURL_CRYPTO_AUTH is not set
+# CONFIG_LIBCURL_DICT is not set
+CONFIG_LIBCURL_FILE=y
+CONFIG_LIBCURL_FTP=y
+# CONFIG_LIBCURL_GNUTLS is not set
+# CONFIG_LIBCURL_GOPHER is not set
+CONFIG_LIBCURL_HTTP=y
+# CONFIG_LIBCURL_IMAP is not set
+# CONFIG_LIBCURL_LDAP is not set
+# CONFIG_LIBCURL_LIBCURL_OPTION is not set
+# CONFIG_LIBCURL_LIBIDN2 is not set
+# CONFIG_LIBCURL_MBEDTLS is not set
+# CONFIG_LIBCURL_NGHTTP2 is not set
+# CONFIG_LIBCURL_NOSSL is not set
+CONFIG_LIBCURL_NO_SMB="!"
+CONFIG_LIBCURL_OPENSSL=y
+# CONFIG_LIBCURL_POP3 is not set
+CONFIG_LIBCURL_PROXY=y
+# CONFIG_LIBCURL_RTSP is not set
+# CONFIG_LIBCURL_SMTP is not set
+# CONFIG_LIBCURL_SSH2 is not set
+# CONFIG_LIBCURL_TELNET is not set
+# CONFIG_LIBCURL_TFTP is not set
+# CONFIG_LIBCURL_THREADED_RESOLVER is not set
+# CONFIG_LIBCURL_TLS_SRP is not set
+# CONFIG_LIBCURL_UNIX_SOCKETS is not set
+# CONFIG_LIBCURL_VERBOSE is not set
+# CONFIG_LIBCURL_WOLFSSL is not set
+# CONFIG_LIBCURL_ZLIB is not set
+# CONFIG_LIBCURL_ZSTD is not set
+CONFIG_PACKAGE_adbyby=y
+CONFIG_PACKAGE_curl=y
+CONFIG_PACKAGE_ip-tiny=y
+CONFIG_PACKAGE_iptables-mod-ipsec=y
+CONFIG_PACKAGE_kmod-crypto-cbc=y
+CONFIG_PACKAGE_kmod-crypto-deflate=y
+CONFIG_PACKAGE_kmod-crypto-des=y
+CONFIG_PACKAGE_kmod-crypto-echainiv=y
+CONFIG_PACKAGE_kmod-crypto-hmac=y
+CONFIG_PACKAGE_kmod-crypto-kpp=y
+CONFIG_PACKAGE_kmod-crypto-lib-blake2s=y
+CONFIG_PACKAGE_kmod-crypto-lib-chacha20=y
+CONFIG_PACKAGE_kmod-crypto-lib-chacha20poly1305=y
+CONFIG_PACKAGE_kmod-crypto-lib-curve25519=y
+CONFIG_PACKAGE_kmod-crypto-lib-poly1305=y
+CONFIG_PACKAGE_kmod-crypto-md5=y
+# CONFIG_PACKAGE_kmod-ip-vti is not set
+# CONFIG_PACKAGE_kmod-ip6-vti is not set
+CONFIG_PACKAGE_kmod-ipsec=y
+CONFIG_PACKAGE_kmod-ipsec4=y
+CONFIG_PACKAGE_kmod-ipsec6=y
+CONFIG_PACKAGE_kmod-ipt-ipsec=y
+CONFIG_PACKAGE_kmod-ipt-offload=y
+CONFIG_PACKAGE_kmod-iptunnel4=y
+CONFIG_PACKAGE_kmod-iptunnel6=y
+CONFIG_PACKAGE_kmod-lib-zlib-deflate=y
+CONFIG_PACKAGE_kmod-nf-flow=y
+CONFIG_PACKAGE_kmod-tcp-bbr=y
+CONFIG_PACKAGE_kmod-udptunnel4=y
+CONFIG_PACKAGE_kmod-udptunnel6=y
+CONFIG_PACKAGE_kmod-wireguard=y
+# CONFIG_PACKAGE_kmod-xfrm-interface is not set
+CONFIG_PACKAGE_libcap=y
+CONFIG_PACKAGE_libcap-bin=y
+CONFIG_PACKAGE_libcap-bin-capsh-shell="/bin/sh"
+CONFIG_PACKAGE_libcurl=y
+CONFIG_PACKAGE_libminiupnpc=y
+CONFIG_PACKAGE_libnatpmp=y
+CONFIG_PACKAGE_libwebsockets-full=y
+CONFIG_PACKAGE_luci-lib-fs=y
+CONFIG_PACKAGE_luci-proto-wireguard=y
+CONFIG_PACKAGE_miniupnpd=y
+CONFIG_PACKAGE_strongswan=y
+CONFIG_PACKAGE_strongswan-charon=y
+# CONFIG_PACKAGE_strongswan-charon-cmd is not set
+# CONFIG_PACKAGE_strongswan-default is not set
+# CONFIG_PACKAGE_strongswan-gencerts is not set
+CONFIG_PACKAGE_strongswan-ipsec=y
+# CONFIG_PACKAGE_strongswan-isakmp is not set
+# CONFIG_PACKAGE_strongswan-libnttfft is not set
+# CONFIG_PACKAGE_strongswan-libtls is not set
+CONFIG_PACKAGE_strongswan-minimal=y
+# CONFIG_PACKAGE_strongswan-mod-addrblock is not set
+CONFIG_PACKAGE_strongswan-mod-aes=y
+# CONFIG_PACKAGE_strongswan-mod-af-alg is not set
+# CONFIG_PACKAGE_strongswan-mod-agent is not set
+# CONFIG_PACKAGE_strongswan-mod-attr is not set
+# CONFIG_PACKAGE_strongswan-mod-attr-sql is not set
+# CONFIG_PACKAGE_strongswan-mod-bliss is not set
+# CONFIG_PACKAGE_strongswan-mod-blowfish is not set
+# CONFIG_PACKAGE_strongswan-mod-ccm is not set
+# CONFIG_PACKAGE_strongswan-mod-chapoly is not set
+# CONFIG_PACKAGE_strongswan-mod-cmac is not set
+# CONFIG_PACKAGE_strongswan-mod-connmark is not set
+# CONFIG_PACKAGE_strongswan-mod-constraints is not set
+# CONFIG_PACKAGE_strongswan-mod-coupling is not set
+# CONFIG_PACKAGE_strongswan-mod-ctr is not set
+# CONFIG_PACKAGE_strongswan-mod-curl is not set
+# CONFIG_PACKAGE_strongswan-mod-curve25519 is not set
+# CONFIG_PACKAGE_strongswan-mod-des is not set
+# CONFIG_PACKAGE_strongswan-mod-dhcp is not set
+# CONFIG_PACKAGE_strongswan-mod-dnskey is not set
+# CONFIG_PACKAGE_strongswan-mod-duplicheck is not set
+# CONFIG_PACKAGE_strongswan-mod-eap-identity is not set
+# CONFIG_PACKAGE_strongswan-mod-eap-md5 is not set
+# CONFIG_PACKAGE_strongswan-mod-eap-mschapv2 is not set
+# CONFIG_PACKAGE_strongswan-mod-eap-radius is not set
+# CONFIG_PACKAGE_strongswan-mod-eap-tls is not set
+# CONFIG_PACKAGE_strongswan-mod-farp is not set
+# CONFIG_PACKAGE_strongswan-mod-fips-prf is not set
+# CONFIG_PACKAGE_strongswan-mod-forecast is not set
+# CONFIG_PACKAGE_strongswan-mod-gcm is not set
+# CONFIG_PACKAGE_strongswan-mod-gcrypt is not set
+CONFIG_PACKAGE_strongswan-mod-gmp=y
+# CONFIG_PACKAGE_strongswan-mod-gmpdh is not set
+# CONFIG_PACKAGE_strongswan-mod-ha is not set
+CONFIG_PACKAGE_strongswan-mod-hmac=y
+CONFIG_PACKAGE_strongswan-mod-kernel-libipsec=y
+CONFIG_PACKAGE_strongswan-mod-kernel-netlink=y
+# CONFIG_PACKAGE_strongswan-mod-ldap is not set
+# CONFIG_PACKAGE_strongswan-mod-led is not set
+# CONFIG_PACKAGE_strongswan-mod-load-tester is not set
+# CONFIG_PACKAGE_strongswan-mod-md4 is not set
+# CONFIG_PACKAGE_strongswan-mod-md5 is not set
+# CONFIG_PACKAGE_strongswan-mod-mgf1 is not set
+# CONFIG_PACKAGE_strongswan-mod-mysql is not set
+# CONFIG_PACKAGE_strongswan-mod-newhope is not set
+CONFIG_PACKAGE_strongswan-mod-nonce=y
+# CONFIG_PACKAGE_strongswan-mod-ntru is not set
+# CONFIG_PACKAGE_strongswan-mod-openssl is not set
+# CONFIG_PACKAGE_strongswan-mod-pem is not set
+# CONFIG_PACKAGE_strongswan-mod-pgp is not set
+# CONFIG_PACKAGE_strongswan-mod-pkcs1 is not set
+# CONFIG_PACKAGE_strongswan-mod-pkcs11 is not set
+# CONFIG_PACKAGE_strongswan-mod-pkcs12 is not set
+# CONFIG_PACKAGE_strongswan-mod-pkcs7 is not set
+# CONFIG_PACKAGE_strongswan-mod-pkcs8 is not set
+CONFIG_PACKAGE_strongswan-mod-pubkey=y
+CONFIG_PACKAGE_strongswan-mod-random=y
+# CONFIG_PACKAGE_strongswan-mod-rc2 is not set
+# CONFIG_PACKAGE_strongswan-mod-resolve is not set
+# CONFIG_PACKAGE_strongswan-mod-revocation is not set
+CONFIG_PACKAGE_strongswan-mod-sha1=y
+# CONFIG_PACKAGE_strongswan-mod-sha2 is not set
+# CONFIG_PACKAGE_strongswan-mod-sha3 is not set
+# CONFIG_PACKAGE_strongswan-mod-smp is not set
+CONFIG_PACKAGE_strongswan-mod-socket-default=y
+# CONFIG_PACKAGE_strongswan-mod-socket-dynamic is not set
+# CONFIG_PACKAGE_strongswan-mod-sql is not set
+# CONFIG_PACKAGE_strongswan-mod-sqlite is not set
+# CONFIG_PACKAGE_strongswan-mod-sshkey is not set
+CONFIG_PACKAGE_strongswan-mod-stroke=y
+# CONFIG_PACKAGE_strongswan-mod-test-vectors is not set
+# CONFIG_PACKAGE_strongswan-mod-uci is not set
+# CONFIG_PACKAGE_strongswan-mod-unity is not set
+CONFIG_PACKAGE_strongswan-mod-updown=y
+# CONFIG_PACKAGE_strongswan-mod-vici is not set
+# CONFIG_PACKAGE_strongswan-mod-whitelist is not set
+CONFIG_PACKAGE_strongswan-mod-x509=y
+# CONFIG_PACKAGE_strongswan-mod-xauth-eap is not set
+CONFIG_PACKAGE_strongswan-mod-xauth-generic=y
+CONFIG_PACKAGE_strongswan-mod-xcbc=y
+# CONFIG_PACKAGE_strongswan-pki is not set
+# CONFIG_PACKAGE_strongswan-scepclient is not set
+# CONFIG_PACKAGE_strongswan-swanctl is not set
+CONFIG_PACKAGE_ttyd=y
+CONFIG_PACKAGE_vsftpd-alt=y
+CONFIG_PACKAGE_wireguard-tools=y
+# CONFIG_PACKAGE_xfrm is not set
+# CONFIG_PACKAGE_ykclient is not set
+CONFIG_PACKAGE_zerotier=y
+CONFIG_STRONGSWAN_ROUTING_TABLE="220"
+CONFIG_STRONGSWAN_ROUTING_TABLE_PRIO="220"
+CONFIG_VSFTPD_USE_UCI_SCRIPTS=y
+# CONFIG_ZEROTIER_ENABLE_DEBUG is not set
+# CONFIG_ZEROTIER_ENABLE_SELFTEST is not set
 EOF
