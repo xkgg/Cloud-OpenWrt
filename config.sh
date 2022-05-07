@@ -6,64 +6,50 @@ CONFIG_TARGET_x86_64=y
 CONFIG_TARGET_x86_64_DEVICE_generic=y
 CONFIG_LIBMBEDTLS_HAVE_SSE2=y
 CONFIG_LIBSODIUM_MINIMAL=y
-CONFIG_PACKAGE_bash=y
+CONFIG_PACKAGE_aliyundrive-webdav=y
 CONFIG_PACKAGE_boost=y
 CONFIG_PACKAGE_boost-date_time=y
 CONFIG_PACKAGE_boost-program_options=y
 CONFIG_PACKAGE_boost-system=y
-CONFIG_PACKAGE_ca-certificates=y
-CONFIG_PACKAGE_coreutils=y
 CONFIG_PACKAGE_coreutils-base64=y
-CONFIG_PACKAGE_coreutils-nohup=y
-CONFIG_PACKAGE_ip-full=y
+CONFIG_PACKAGE_ip-tiny=y
 CONFIG_PACKAGE_ipt2socks=y
-CONFIG_PACKAGE_libbpf=y
-CONFIG_PACKAGE_libcap-bin=y
-CONFIG_PACKAGE_libcap-bin-capsh-shell="/bin/sh"
+CONFIG_PACKAGE_iputils-arping=y
+CONFIG_PACKAGE_jq=y
 CONFIG_PACKAGE_libdb47=y
-CONFIG_PACKAGE_libelf=y
 CONFIG_PACKAGE_libev=y
 CONFIG_PACKAGE_libmaxminddb=y
 CONFIG_PACKAGE_libmbedtls=y
-CONFIG_PACKAGE_libruby=y
 CONFIG_PACKAGE_libsodium=y
 CONFIG_PACKAGE_libudns=y
-CONFIG_PACKAGE_libyaml=y
 CONFIG_PACKAGE_lua-cjson=y
 CONFIG_PACKAGE_lua-maxminddb=y
 CONFIG_PACKAGE_luasocket=y
 # CONFIG_PACKAGE_luci-app-accesscontrol is not set
 # CONFIG_PACKAGE_luci-app-adbyby-plus is not set
 # CONFIG_PACKAGE_luci-app-arpbind is not set
+# CONFIG_PACKAGE_luci-app-autoreboot is not set
 # CONFIG_PACKAGE_luci-app-ddns is not set
 # CONFIG_PACKAGE_luci-app-filetransfer is not set
 # CONFIG_PACKAGE_luci-app-ipsec-vpnd is not set
+CONFIG_PACKAGE_luci-app-openclash=y
+# CONFIG_PACKAGE_luci-app-ramfree is not set
 # CONFIG_PACKAGE_luci-app-rclone_INCLUDE_rclone-ng is not set
 # CONFIG_PACKAGE_luci-app-rclone_INCLUDE_rclone-webui is not set
 # CONFIG_PACKAGE_luci-app-ttyd is not set
 # CONFIG_PACKAGE_luci-app-turboacc is not set
 # CONFIG_PACKAGE_luci-app-turboacc_INCLUDE_BBR_CCA is not set
 # CONFIG_PACKAGE_luci-app-turboacc_INCLUDE_OFFLOADING is not set
+# CONFIG_PACKAGE_luci-app-unblockmusic is not set
+# CONFIG_PACKAGE_luci-app-unblockmusic_INCLUDE_UnblockNeteaseMusic_Go is not set
 # CONFIG_PACKAGE_luci-app-upnp is not set
 # CONFIG_PACKAGE_luci-app-vsftpd is not set
 CONFIG_PACKAGE_luci-app-vssr=y
+# CONFIG_PACKAGE_luci-app-vssr_INCLUDE_ShadowsocksR_Libev_Server is not set
 # CONFIG_PACKAGE_luci-app-wireguard is not set
 # CONFIG_PACKAGE_luci-app-xlnetacc is not set
-# CONFIG_PACKAGE_luci-app-zerotier is not set
 CONFIG_PACKAGE_luci-i18n-vssr-zh-cn=y
 CONFIG_PACKAGE_luci-theme-opentomcat=y
-CONFIG_PACKAGE_ruby=y
-CONFIG_PACKAGE_ruby-bigdecimal=y
-CONFIG_PACKAGE_ruby-date=y
-CONFIG_PACKAGE_ruby-dbm=y
-CONFIG_PACKAGE_ruby-digest=y
-CONFIG_PACKAGE_ruby-enc=y
-CONFIG_PACKAGE_ruby-forwardable=y
-CONFIG_PACKAGE_ruby-pstore=y
-CONFIG_PACKAGE_ruby-psych=y
-CONFIG_PACKAGE_ruby-stringio=y
-CONFIG_PACKAGE_ruby-strscan=y
-CONFIG_PACKAGE_ruby-yaml=y
 CONFIG_PACKAGE_shadowsocks-libev-config=y
 CONFIG_PACKAGE_shadowsocks-libev-ss-local=y
 CONFIG_PACKAGE_shadowsocks-libev-ss-redir=y
@@ -75,7 +61,6 @@ CONFIG_PACKAGE_simple-obfs-client=y
 CONFIG_PACKAGE_trojan=y
 CONFIG_PACKAGE_xray-core=y
 CONFIG_PACKAGE_xray-plugin=y
-CONFIG_TARGET_ROOTFS_PARTSIZE=180
 # CONFIG_VMDK_IMAGES is not set
 CONFIG_boost-compile-visibility-hidden=y
 CONFIG_boost-runtime-shared=y
@@ -83,40 +68,8 @@ CONFIG_boost-static-and-shared-libs=y
 CONFIG_boost-variant-release=y
 # CONFIG_BUSYBOX_CONFIG_FEATURE_IP_LINK is not set
 # CONFIG_BUSYBOX_CONFIG_IP is not set
-CONFIG_LIBCURL_COOKIES=y
-# CONFIG_LIBCURL_CRYPTO_AUTH is not set
-# CONFIG_LIBCURL_DICT is not set
-CONFIG_LIBCURL_FILE=y
-CONFIG_LIBCURL_FTP=y
-# CONFIG_LIBCURL_GNUTLS is not set
-# CONFIG_LIBCURL_GOPHER is not set
-CONFIG_LIBCURL_HTTP=y
-# CONFIG_LIBCURL_IMAP is not set
-# CONFIG_LIBCURL_LDAP is not set
-# CONFIG_LIBCURL_LIBCURL_OPTION is not set
-# CONFIG_LIBCURL_LIBIDN2 is not set
-# CONFIG_LIBCURL_MBEDTLS is not set
-# CONFIG_LIBCURL_NGHTTP2 is not set
-# CONFIG_LIBCURL_NOSSL is not set
-CONFIG_LIBCURL_NO_SMB="!"
-CONFIG_LIBCURL_OPENSSL=y
-# CONFIG_LIBCURL_POP3 is not set
-CONFIG_LIBCURL_PROXY=y
-# CONFIG_LIBCURL_RTSP is not set
-# CONFIG_LIBCURL_SMTP is not set
-# CONFIG_LIBCURL_SSH2 is not set
-# CONFIG_LIBCURL_TELNET is not set
-# CONFIG_LIBCURL_TFTP is not set
-# CONFIG_LIBCURL_THREADED_RESOLVER is not set
-# CONFIG_LIBCURL_TLS_SRP is not set
-# CONFIG_LIBCURL_UNIX_SOCKETS is not set
-# CONFIG_LIBCURL_VERBOSE is not set
-# CONFIG_LIBCURL_WOLFSSL is not set
-# CONFIG_LIBCURL_ZLIB is not set
-# CONFIG_LIBCURL_ZSTD is not set
+CONFIG_PACKAGE_UnblockNeteaseMusic-Go=y
 CONFIG_PACKAGE_adbyby=y
-CONFIG_PACKAGE_curl=y
-CONFIG_PACKAGE_ip-tiny=y
 CONFIG_PACKAGE_iptables-mod-ipsec=y
 CONFIG_PACKAGE_kmod-crypto-cbc=y
 CONFIG_PACKAGE_kmod-crypto-deflate=y
@@ -146,12 +99,6 @@ CONFIG_PACKAGE_kmod-udptunnel4=y
 CONFIG_PACKAGE_kmod-udptunnel6=y
 CONFIG_PACKAGE_kmod-wireguard=y
 # CONFIG_PACKAGE_kmod-xfrm-interface is not set
-CONFIG_PACKAGE_libcap=y
-CONFIG_PACKAGE_libcap-bin=y
-CONFIG_PACKAGE_libcap-bin-capsh-shell="/bin/sh"
-CONFIG_PACKAGE_libcurl=y
-CONFIG_PACKAGE_libminiupnpc=y
-CONFIG_PACKAGE_libnatpmp=y
 CONFIG_PACKAGE_libwebsockets-full=y
 CONFIG_PACKAGE_luci-lib-fs=y
 CONFIG_PACKAGE_luci-proto-wireguard=y
@@ -253,11 +200,7 @@ CONFIG_PACKAGE_ttyd=y
 CONFIG_PACKAGE_vsftpd-alt=y
 CONFIG_PACKAGE_wireguard-tools=y
 # CONFIG_PACKAGE_xfrm is not set
-# CONFIG_PACKAGE_ykclient is not set
-CONFIG_PACKAGE_zerotier=y
 CONFIG_STRONGSWAN_ROUTING_TABLE="220"
 CONFIG_STRONGSWAN_ROUTING_TABLE_PRIO="220"
 CONFIG_VSFTPD_USE_UCI_SCRIPTS=y
-# CONFIG_ZEROTIER_ENABLE_DEBUG is not set
-# CONFIG_ZEROTIER_ENABLE_SELFTEST is not set
 EOF

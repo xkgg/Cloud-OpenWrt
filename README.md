@@ -1,6 +1,7 @@
 # 云编译 OpenWrt 固件
 
 更新日志：
+- 2022-05-07 同步源码，个性化设置
 - 2022-04-28 同步源码，Release默认保留3个
 - 2022-04-26 同步源码，个性化设置
 - 2021-03-15 同步源码
@@ -19,7 +20,7 @@
 - 本项目编译固件适配 x86_64 软路由。
 - 本项目不定期更新。
 
-
+![X86_OpenWRT.png](https://s2.loli.net/2022/05/07/8zrTcZfHqMCGVbo.png)
 
 ## 感谢 ❤️
 - 源码来源： Lean 的 Openwrt 源码仓库 https://github.com/coolsnowwolf/lede
