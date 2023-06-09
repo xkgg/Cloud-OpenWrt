@@ -6,6 +6,8 @@ on:
       - main
     paths:
       - 'README.md'
+      - 'script.sh'
+      - 'config.sh'
 
 env:
   REPO_URL: https://github.com/coolsnowwolf/lede
@@ -117,6 +119,10 @@ jobs:
         body: |
           编译使用版本:
           ${{ env.useVersionInfo }}
+
+          刷机固件简介：
+            打包日期：${{ env.PACKAGED_OUTPUTDATE }}
+            默认IP：192.168.1.1 默认用户名密码： root/password
         artifacts: "${{ env.FIRMWARE }}/*"
 
     - name: Remove old Releases
