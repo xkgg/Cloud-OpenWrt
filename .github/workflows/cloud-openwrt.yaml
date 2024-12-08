@@ -31,7 +31,7 @@ jobs:
       with:
         ref: main
 
-    - name: Initialization environment
+    - name: 部署编译环境
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
@@ -46,7 +46,7 @@ jobs:
         sudo timedatectl set-timezone "$TZ"
         df -h
 
-    - name: Clone source code
+    - name: 克隆源码
       run: |
         git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
         cd openwrt
