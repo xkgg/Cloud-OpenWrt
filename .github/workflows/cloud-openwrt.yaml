@@ -59,7 +59,7 @@ jobs:
         echo "DATE=$(date "+%Y-%m-%d %H:%M:%S")" >> $GITHUB_ENV
         echo "tag_name=$(date +%Y%m%d)" >> $GITHUB_ENV
 
-    - name: Update feeds
+    - name: 更新 feeds
       run: |
         chmod +x $SCRIPT_SH
         ./$SCRIPT_SH
@@ -67,24 +67,24 @@ jobs:
         #sed -i 's/#src-git helloworld/src-git helloworld/g' ./feeds.conf.default
         ./scripts/feeds update -a
 
-    - name: Install feeds
+    - name: 安装 feeds
       run: |
         cd openwrt
         ./scripts/feeds install -a
 
-    - name: Load custom configuration
+    - name: 加载自定义 configuration
       run: |
         chmod +x $CONFIG_SH
         ./$CONFIG_SH
 
-    - name: Download package
+    - name: 下载 package
       run: |
         cd openwrt
         make defconfig
         make download -j8
         find dl -size -1024c -exec rm -f {} \;
 
-    - name: Compile the firmware
+    - name: 编译 firmware
       run: |
         cd openwrt
         echo -e "$(nproc) thread compile"
