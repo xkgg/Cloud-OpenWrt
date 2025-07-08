@@ -2,10 +2,18 @@ name: Cloud OpenWrt
 
 # Add a button to trigger the workflow
 on: 
+# 定时自动编译
+  schedule:
+    - cron: 0 20 * * *
   repository_dispatch:
   workflow_dispatch:
-  schedule:
-    - cron: 0 1 * * 5
+    inputs:
+      SSH_ACTION:
+        description: 'SSH远程配置固件'
+        required: false
+        default: 'false'
+        type: boolean
+
   
   push:
     branches:
@@ -69,6 +77,12 @@ jobs:
     - name: 将库文件迁移到运行器
       uses: actions/checkout@main
       
+    - name: 检测文件和对比上游版本
+      run: |
+        cd ${GITHUB_WORKSPACE}
+        export INPUTS_SSH_ACTION="${{ github.event.inputs.SSH_ACTION }}"
+        
+        
     - name: 克隆源码
       run: |
         git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
@@ -91,6 +105,10 @@ jobs:
         cd openwrt
         ./scripts/feeds install -a
 
+    - name: SSH远程连接（make menuconfig）
+      if: env.SSH_ACTION == 'true'
+      uses: danshui-git/debugger-action@main
+      
     - name: 加载自定义 configuration
       run: |
         chmod +x $CONFIG_SH
