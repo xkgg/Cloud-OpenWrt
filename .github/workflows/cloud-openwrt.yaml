@@ -81,6 +81,7 @@ jobs:
       run: |
         cd ${GITHUB_WORKSPACE}
         export INPUTS_SSH_ACTION="${{ github.event.inputs.SSH_ACTION }}"
+        echo "INPUTS_SSH_ACTION=${{ inputs.SSH_ACTION || 'false' }}" >> $GITHUB_ENV
         
         
     - name: 克隆源码
