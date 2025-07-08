@@ -41,10 +41,6 @@ jobs:
         echo "--------------------------硬盘信息--------------------------"
         echo "硬盘数量: $(ls /dev/sd* | grep -v [1-9] | wc -l)" && df -hT
         
-    - name: Checkout
-      uses: actions/checkout@v2
-      with:
-        ref: main
 
     - name: 部署编译环境
       env:
@@ -68,6 +64,9 @@ jobs:
         temp-reserve-mb: 100
         root-reserve-mb: 1024
         
+    - name: 将库文件迁移到运行器
+      uses: actions/checkout@main
+      
     - name: 克隆源码
       run: |
         git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
