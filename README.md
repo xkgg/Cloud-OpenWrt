@@ -1,5 +1,5 @@
 # 云编译 OpenWrt 固件
-
+原作者 https://github.com/huangqian8/Cloud-OpenWrt
 更新日志：
 - 2023-06-09 同步源码，个性化设置
 - 2022-09-21 同步源码，个性化设置
