@@ -135,7 +135,8 @@ jobs:
         du -h --max-depth=1 ./ --exclude=build_dir --exclude=bin
         du -h --max-depth=1 ./build_dir
         du -h --max-depth=1 ./bin
-        echo "::set-output name=status::success"
+        echo "status=success" >> $GITHUB_OUTPUT
+        echo "{name}={value}" >> $GITHUB_STATE
 
     - name: Organize files
       id: organize
@@ -144,7 +145,7 @@ jobs:
         cd openwrt/bin/targets/*/*
         rm -rf packages feeds.buildinfo openwrt-x86-64-generic-kernel.bin openwrt-x86-64-generic-squashfs-rootfs.img openwrt-x86-64-generic.manifest sha256sums version.buildinfo
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
-        echo "status=success" >> $GITHUB_ENV
+        echo "status=success" >> $GITHUB_OUTPUT
         
     - name: Upload firmware directory
       uses: actions/upload-artifact@main
