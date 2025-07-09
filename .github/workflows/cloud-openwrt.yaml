@@ -79,11 +79,11 @@ jobs:
     - name: 将库文件迁移到运行器
       uses: actions/checkout@main
       
-    - name: 检测文件和对比上游版本
-      run: |
-        cd ${GITHUB_WORKSPACE}
-        export INPUTS_SSH_ACTION="${{ github.event.inputs.SSH_ACTION }}"
-        echo "INPUTS_SSH_ACTION=${{ inputs.SSH_ACTION || 'false' }}" >> $GITHUB_ENV
+#    - name: 检测文件和对比上游版本
+#      run: |
+#        cd ${GITHUB_WORKSPACE}
+#        export INPUTS_SSH_ACTION="${{ github.event.inputs.SSH_ACTION }}"
+#        echo "INPUTS_SSH_ACTION=${{ inputs.SSH_ACTION || 'false' }}" >> $GITHUB_ENV
         
         
     - name: 克隆源码
@@ -109,7 +109,8 @@ jobs:
         ./scripts/feeds install -a
 
     - name: SSH远程连接（make menuconfig）
-      if: env.SSH_ACTION == 'true'
+#      if: env.SSH_ACTION == 'true'
+      if: (github.event.inputs.SSH_ACTION == 'true' && github.event.inputs.SSH_ACTION  != 'false') || contains(github.event.action, 'SSH_ACTION')
       uses: danshui-git/debugger-action@main
       
     - name: 加载自定义 configuration
