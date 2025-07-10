@@ -24,7 +24,7 @@ on:
       - 'config.sh'
 
 env:
-  GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+  GITHUB_TOKEN: ${{secrets.REPO_TOKEN}}
   
   REPO_URL: https://github.com/coolsnowwolf/lede
   REPO_BRANCH: master
@@ -164,7 +164,7 @@ jobs:
         allowUpdates: true
         tag: ${{ env.tag_name }}
         commit: main
-        token: ${{ secrets.actions_release }}
+        token: ${{ secrets.REPO_TOKEN }}
         body: |
           编译使用版本:
           ${{ env.useVersionInfo }}
@@ -180,4 +180,4 @@ jobs:
         keep_latest: 3
         delete_tags: true
       env:
-        GITHUB_TOKEN: ${{ secrets.actions_release }}
+        GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
