@@ -90,14 +90,25 @@ jobs:
             ${{ env.BUILDER_DIR }}/bin/targets/x86/64/*.manifest
           retention-days: 7
 
-      - name: Create Release (Optional)
-        if: github.event_name == 'workflow_dispatch' && startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            ${{ env.BUILDER_DIR }}/bin/targets/x86/64/*.img.gz
-            ${{ env.BUILDER_DIR }}/bin/targets/x86/64/*.efi.gz
-          tag_name: ${{ github.ref_name }}
-          name: OpenWrt x86_64 ${{ github.ref_name }}
-          draft: false
-          prerelease: false
+ - name: Set Release Tag
+  id: release_tag
+  run: |
+    if [[ "${{ github.event_name }}" == "push" ]]; then
+      echo "tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+      echo "name=OpenWrt x86_64 ${{ github.ref_name }}" >> $GITHUB_OUTPUT
+    else
+      echo "tag=openwrt-x86_64-${{ env.BUILD_DATE }}" >> $GITHUB_OUTPUT
+      echo "name=OpenWrt x86_64 ${{ github.event.inputs.openwrt_version }}-${{ env.BUILD_DATE }}" >> $GITHUB_OUTPUT
+    fi
+
+- name: Create Release
+  if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/')
+  uses: softprops/action-gh-release@v2
+  with:
+    files: |
+      ${{ env.BUILDER_DIR }}/bin/targets/x86/64/*.img.gz
+      ${{ env.BUILDER_DIR }}/bin/targets/x86/64/*.efi.gz
+    tag_name: ${{ steps.release_tag.outputs.tag }}
+    name: ${{ steps.release_tag.outputs.name }}
+    draft: false
+    prerelease: false
