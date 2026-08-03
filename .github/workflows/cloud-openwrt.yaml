@@ -175,12 +175,12 @@ jobs:
         artifacts: "${{ env.FIRMWARE }}/*"
 
     - name: Remove old Releases
-      uses: dev-drprasad/delete-older-releases@v0.1.0
+      uses: ophub/delete-releases-workflows@main
       with:
-        keep_latest: 3
+        releases_keep_latest: 3
         delete_tags: true
       env:
-        GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
+        gh_token: ${{ secrets.REPO_TOKEN }}
 
     - name: Delete old runs
       uses: Mattraks/delete-workflow-runs@v2
