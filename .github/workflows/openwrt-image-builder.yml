@@ -42,8 +42,7 @@ jobs:
       - name: Download Image Builder
         run: |
           VERSION="${{ github.event.inputs.openwrt_version }}"
-          BUILDER_URL="https://downloads.openwrt.org/releases/${VERSION}/targets/x86/64/openwrt-imagebuilder-${VERSION}-x86-64.Linux-x86_64.tar.xz"
-
+          BUILDER_URL="https://downloads.openwrt.org/releases/${VERSION}/targets/x86/64/openwrt-imagebuilder-${VERSION}-x86-64.Linux-x86_64.tar.zst"
           echo "Downloading: ${BUILDER_URL}"
           wget -q "${BUILDER_URL}" -O imagebuilder.tar.xz
           tar -xf imagebuilder.tar.xz
