@@ -1,0 +1,100 @@
+name: Build OpenWrt x86_64 (ImageBuilder)
+
+on:
+  workflow_dispatch:
+    inputs:
+      openwrt_version:
+        description: 'OpenWrt Version'
+        required: true
+        default: '24.10.8'
+      custom_packages:
+        description: 'Custom Packages (space separated)'
+        required: false
+        default: 'luci luci-app-ttyd luci-app-upnp kmod-usb-net-rtl8152'
+      include_docker:
+        description: 'Include Docker?'
+        type: boolean
+        default: false
+
+env:
+  TZ: Asia/Shanghai
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@main
+
+      - name: Initialize Environment
+        run: |
+          echo "BUILD_DATE=$(date +%Y%m%d%H%M)" >> $GITHUB_ENV
+          sudo apt-get update -qq
+          sudo /bin/bash -c "$(curl -sL https://git.io/vokNn)"
+          sudo -E apt-fast -y -qq install asciidoc bash bcc bin86 binutils bison bzip2 clang file flex g++ g++-multilib gawk gcc-multilib gettext git gzip help2man intltool libbpf-dev libboost-dev libelf-dev libncurses-dev libssl-dev libthread-queue-any-perl libusb-dev libxml-parser-perl linux-tools-generic llvm make patch perl-modules pkg-config python3-dev python3-pip python3-pyelftools python3-setuptools rsync sharutils swig time unzip util-linux wget xsltproc zlib1g-dev zip zstd
+          sudo -E apt-fast -y -qq install dos2unix dwarves jq npm quilt rename
+
+      - name: Download Image Builder
+        run: |
+          VERSION="${{ github.event.inputs.openwrt_version }}"
+          BUILDER_URL="https://downloads.openwrt.org/releases/%24{VERSION}/targets/x86/64/openwrt-imagebuilder-%24{VERSION}-x86-64.Linux-x86_64.tar.xz"
+          
+          echo "Downloading: ${BUILDER_URL}"
+          wget -q "${BUILDER_URL}" -O imagebuilder.tar.xz
+          tar -xf imagebuilder.tar.xz
+          
+          # 获取解压后的目录名并写入环境变量
+          BUILDER_DIR=$(ls -d openwrt-imagebuilder-*-x86-64.Linux-x86_64)
+          echo "BUILDER_DIR=${BUILDER_DIR}" >> $GITHUB_ENV
+          echo "✅ Image Builder ready: ${BUILDER_DIR}"
+
+      - name: Prepare Custom Files (Optional)
+        run: |
+          # 如果有自定义文件(如默认配置、脚本等)，放到仓库的 files/ 目录下
+          if [ -d "files" ]; then
+            cp -rf files/* "${{ env.BUILDER_DIR }}/files/" 2>/dev/null || true
+            echo "✅ Custom files copied"
+          fi
+
+      - name: Build Firmware
+        run: |
+          cd "${{ env.BUILDER_DIR }}"
+          
+          PACKAGES="${{ github.event.inputs.custom_packages }}"
+          
+          # 如果勾选了 Docker，追加相关包
+          if [ "${{ github.event.inputs.include_docker }}" == "true" ]; then
+            PACKAGES="${PACKAGES} docker dockerd luci-app-dockerd"
+          fi
+          
+          echo "📦 Installing packages: ${PACKAGES}"
+          
+          make image \
+            PACKAGES="${PACKAGES}" \
+            FILES="files" \
+            EXTRA_IMAGE_NAME="custom-${{ env.BUILD_DATE }}"
+          
+          echo "✅ Build completed!"
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: OpenWrt-x86_64-${{ env.BUILD_DATE }}
+          path: |
+            ${{ env.BUILDER_DIR }}/bin/targets/x86/64/*.img.gz
+            ${{ env.BUILDER_DIR }}/bin/targets/x86/64/*.efi.gz
+            ${{ env.BUILDER_DIR }}/bin/targets/x86/64/*.manifest
+          retention-days: 7
+
+      - name: Create Release (Optional)
+        if: github.event_name == 'workflow_dispatch' && startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            ${{ env.BUILDER_DIR }}/bin/targets/x86/64/*.img.gz
+            ${{ env.BUILDER_DIR }}/bin/targets/x86/64/*.efi.gz
+          tag_name: ${{ github.ref_name }}
+          name: OpenWrt x86_64 ${{ github.ref_name }}
+          draft: false
+          prerelease: false
