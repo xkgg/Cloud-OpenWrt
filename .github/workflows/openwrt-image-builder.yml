@@ -24,6 +24,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Maximize build space
+        uses: easimon/maximize-build-space@master
+        with:
+        # 给 root 留足空间给 apt / 日志 / 临时文件（建议 >= 2GB；这里给 4GB 更稳）
+         root-reserve-mb: 4096
+        # 给 /mnt 留少量空间
+         temp-reserve-mb: 100
+        # swap 小一点省空间（内存不够可调大）
+         swap-size-mb: 1024
+         remove-dotnet: 'true'
+         remove-android: 'true'
+         remove-haskell: 'true'
+         remove-codeql: 'true'
+         remove-docker-images: 'true'
+
+
+
+    
       - name: Checkout
         uses: actions/checkout@main
 
