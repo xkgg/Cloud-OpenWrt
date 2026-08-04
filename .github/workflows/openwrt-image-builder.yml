@@ -41,14 +41,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      
-      - name: 合并磁盘 Disks
-        uses: easimon/maximize-build-space@master
-        with:
-          swap-size-mb: 1024
-          temp-reserve-mb: 100
-          root-reserve-mb: 1024
-    
+ 
       - name: Checkout
         uses: actions/checkout@main
 
@@ -63,7 +56,14 @@ jobs:
             g++ g++-multilib gawk gcc-multilib gettext git gzip help2man \
             intltool libbpf-dev libboost-dev lib[...] \
             dos2unix dwarves jq npm quilt rename
-
+            
+      - name: 合并磁盘 Disks
+        uses: easimon/maximize-build-space@master
+        with:
+          swap-size-mb: 1024
+          temp-reserve-mb: 100
+          root-reserve-mb: 1024
+          
       - name: Download Image Builder
         run: |
           VERSION="${{ github.event.inputs.openwrt_version }}"
