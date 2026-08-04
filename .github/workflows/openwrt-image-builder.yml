@@ -16,8 +16,10 @@ on:
         type: boolean
         default: false
 
+
 env:
   TZ: Asia/Shanghai
+
 
 jobs:
   build:
@@ -80,7 +82,7 @@ jobs:
             PACKAGES="${PACKAGES}" \
             FILES="files" \
             EXTRA_IMAGE_NAME="custom-${{ env.BUILD_DATE }}"
-
+            CONFIG_TARGET_ROOTFS_PARTSIZE=2048  # ← 加在这里，单位 MB
           echo "✅ Build completed!"
 
       - name: Upload Artifacts
