@@ -42,8 +42,7 @@ jobs:
 
     steps:
  
-      - name: Checkout
-        uses: actions/checkout@main
+
 
       - name: Initialize Environment
         run: |
@@ -57,6 +56,9 @@ jobs:
             intltool libbpf-dev libboost-dev lib[...] \
             dos2unix dwarves jq npm quilt rename
             
+      - name: Checkout
+        uses: actions/checkout@main
+        
       - name: 合并磁盘 Disks
         uses: easimon/maximize-build-space@master
         with:
