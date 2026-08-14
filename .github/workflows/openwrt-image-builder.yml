@@ -53,7 +53,7 @@ jobs:
           sudo -E apt-fast -y -qq install \
             asciidoc bash bcc bin86 binutils bison bzip2 clang file flex \
             g++ g++-multilib gawk gcc-multilib gettext git gzip help2man \
-            intltool libbpf-dev libboost-dev lib[...] \
+            intltool libbpf-dev libboost-dev \
             dos2unix dwarves jq npm quilt rename
             
       - name: Checkout
@@ -93,6 +93,14 @@ jobs:
 
           PACKAGES="${{ github.event.inputs.custom_packages }}"
 
+          # Read additional packages from the repository-level .config file.
+          # Only package selectors are used; package feature sub-options are ignored.
+          CONFIG_FILE="${GITHUB_WORKSPACE}/.config"
+          if [ -f "${CONFIG_FILE}" ]; then
+            CONFIG_PACKAGES="$(awk -F= '/^CONFIG_PACKAGE_[a-zA-Z0-9][a-zA-Z0-9+.-]*=y$/ { sub(/^CONFIG_PACKAGE_/, "", $1); printf "%s ", $1 }' "${CONFIG_FILE}")"
+            PACKAGES="${PACKAGES} ${CONFIG_PACKAGES}"
+          fi
+
           # 如果勾选了 Docker，追加相关包
           if [ "${{ github.event.inputs.include_docker }}" == "true" ]; then
             PACKAGES="${PACKAGES} docker dockerd luci-app-dockerd"
@@ -103,8 +111,8 @@ jobs:
           make image \
             PACKAGES="${PACKAGES}" \
             FILES="files" \
-            EXTRA_IMAGE_NAME="custom-${{ env.BUILD_DATE }}"
-            CONFIG_TARGET_ROOTFS_PARTSIZE=2048  # ← 加在这里，单位 MB
+            EXTRA_IMAGE_NAME="custom-${{ env.BUILD_DATE }}" \
+            CONFIG_TARGET_ROOTFS_PARTSIZE=2048
           echo "✅ Build completed!"
 
       - name: Upload Artifacts

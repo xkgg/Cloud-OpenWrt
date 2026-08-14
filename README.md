@@ -7,6 +7,16 @@
 - 本项目编译固件适配 x86_64 软路由。
 - 本项目不定期更新。
 
+### ImageBuilder 插件配置
+
+`openwrt-image-builder.yml` 会读取仓库根目录的 `.config`，将
+`CONFIG_PACKAGE_<包名>=y` 转换为 ImageBuilder 的软件包列表并合并到
+`custom_packages`。在 `.config` 中添加软件包后，手动触发
+`Build OpenWrt x86_64 (ImageBuilder)` 工作流即可生效。
+
+仅可添加所选 OpenWrt 发行版软件源中存在的软件包；`*_INCLUDE_*` 等插件
+内部功能选项不适用于 ImageBuilder，会被忽略。
+
 ![X86_OpenWRT.png](https://s2.loli.net/2022/05/07/8zrTcZfHqMCGVbo.png)
 
 ## 感谢 ❤️
