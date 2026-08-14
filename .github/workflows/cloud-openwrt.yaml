@@ -5,7 +5,6 @@ on:
 # 定时自动编译
   schedule:
     - cron: 0 20 * * *
-  repository_dispatch:
   workflow_dispatch:
     inputs:
       SSH_ACTION:
