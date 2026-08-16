@@ -92,7 +92,7 @@ jobs:
               RELEASE_URL="https://api.github.com/repos/${{ github.repository }}/releases/tags/${TAG}"
               ASSET_URL="$(curl -fsSL -H "Authorization: Bearer ${GITHUB_TOKEN}" "${RELEASE_URL}" | jq -r '[.assets[] | select(.name | test("imagebuilder.*\\.tar\\.zst$"; "i"))] | .[0].browser_download_url // empty')"
             fi
-            [ -n "${ASSET_URL}" ] || { echo "Custom ImageBuilder asset not found"; exit 1; }
+            [ -n "${ASSET_URL}" ] || { echo "Custom ImageBuilder asset not found. Run Cloud OpenWrt successfully first."; exit 1; }
             curl -fL -H "Authorization: Bearer ${GITHUB_TOKEN}" "${ASSET_URL}" -o imagebuilder.tar.zst
           else
             VERSION="${{ github.event.inputs.openwrt_version }}"

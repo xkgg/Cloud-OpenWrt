@@ -18,6 +18,7 @@ on:
     branches:
       - main
     paths:
+      - '.config'
       - 'README.md'
       - 'script.sh'
       - 'config.sh'
@@ -139,6 +140,11 @@ jobs:
         du -h --max-depth=1 ./bin
         echo "status=success" >> $GITHUB_OUTPUT
         echo "{name}={value}" >> $GITHUB_STATE
+
+    - name: Verify custom ImageBuilder
+      run: |
+        cd openwrt/bin/targets/*/*
+        ls -lh *imagebuilder*.tar.zst
 
     - name: Organize files
       id: organize
