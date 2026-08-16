@@ -3,21 +3,6 @@ name: Build OpenWrt x86_64 (ImageBuilder)
 on:
   workflow_dispatch:
     inputs:
-      openwrt_version:
-        description: 'Official ImageBuilder version (only used when source is official)'
-        required: true
-        default: '24.10.8'
-      imagebuilder_source:
-        description: 'ImageBuilder source'
-        type: choice
-        options:
-          - custom
-          - official
-        default: custom
-      imagebuilder_tag:
-        description: 'Custom ImageBuilder release tag, or latest'
-        required: false
-        default: 'latest'
       custom_packages:
         description: 'Custom Packages (space separated)'
         required: false
@@ -45,6 +30,8 @@ on:
 
 env:
   TZ: Asia/Shanghai
+  REPO_URL: https://github.com/coolsnowwolf/lede
+  REPO_BRANCH: master
 
 permissions:
   contents: read
@@ -60,14 +47,8 @@ jobs:
       - name: Initialize Environment
         run: |
           echo "BUILD_DATE=$(date +%Y%m%d%H%M)" >> $GITHUB_ENV
-          sudo apt-get update -qq
-          sudo /bin/bash -c "$(curl -sL https://git.io/vokNn)"
-          # 将较长的包安装命令拆分为多行以便阅读和对齐
-          sudo -E apt-fast -y -qq install \
-            asciidoc bash bcc bin86 binutils bison bzip2 clang file flex \
-            g++ g++-multilib gawk gcc-multilib gettext git gzip help2man \
-            intltool libbpf-dev libboost-dev \
-            dos2unix dwarves jq npm quilt rename
+          sudo -E apt-get update
+          sudo -E apt-get -y install $(curl -fsSL is.gd/depends_ubuntu_2204)
             
       - name: Checkout
         uses: actions/checkout@main
@@ -79,32 +60,28 @@ jobs:
           temp-reserve-mb: 100
           root-reserve-mb: 1024
           
-      - name: Download Image Builder
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
+      - name: Build source and ImageBuilder
         run: |
-          SOURCE="${{ github.event.inputs.imagebuilder_source }}"
-          if [ "${SOURCE}" = "custom" ]; then
-            TAG="${{ github.event.inputs.imagebuilder_tag }}"
-            if [ "${TAG}" = "latest" ]; then
-              ASSET_URL="$(curl -fsSL -H "Authorization: Bearer ${GITHUB_TOKEN}" "https://api.github.com/repos/${{ github.repository }}/releases?per_page=100" | jq -r '[.[] | .assets[] | select(.name | test("imagebuilder.*\\.tar\\.zst$"; "i"))] | .[0].browser_download_url // empty')"
-            else
-              RELEASE_URL="https://api.github.com/repos/${{ github.repository }}/releases/tags/${TAG}"
-              ASSET_URL="$(curl -fsSL -H "Authorization: Bearer ${GITHUB_TOKEN}" "${RELEASE_URL}" | jq -r '[.assets[] | select(.name | test("imagebuilder.*\\.tar\\.zst$"; "i"))] | .[0].browser_download_url // empty')"
-            fi
-            [ -n "${ASSET_URL}" ] || { echo "Custom ImageBuilder asset not found. Run Cloud OpenWrt successfully first."; exit 1; }
-            curl -fL -H "Authorization: Bearer ${GITHUB_TOKEN}" "${ASSET_URL}" -o imagebuilder.tar.zst
-          else
-            VERSION="${{ github.event.inputs.openwrt_version }}"
-            BUILDER_URL="https://downloads.openwrt.org/releases/${VERSION}/targets/x86/64/openwrt-imagebuilder-${VERSION}-x86-64.Linux-x86_64.tar.zst"
-            wget -q "${BUILDER_URL}" -O imagebuilder.tar.zst
-          fi
-          tar -xf imagebuilder.tar.zst
+          git clone --depth 1 "${REPO_URL}" -b "${REPO_BRANCH}" openwrt
+          chmod +x script.sh config.sh
+          ./script.sh
+          cd openwrt
+          ./scripts/feeds update -a
+          ./scripts/feeds install -a
+          cd ..
+          ./config.sh
+          cd openwrt
+          make defconfig
+          make download -j8
+          find dl -size -1024c -exec rm -f {} \;
+          make -j$(nproc) || make -j1 V=s
 
-          # 获取解压后的目录名并写入环境变量
-          BUILDER_DIR=$(find . -maxdepth 1 -mindepth 1 -type d -name '*imagebuilder*-x86-64.Linux-x86_64' -printf '%f\n' | head -n1)
+          BUILDER_ARCHIVE=$(find bin/targets/x86/64 -maxdepth 1 -type f -name '*imagebuilder*.tar.zst' -print -quit)
+          [ -n "${BUILDER_ARCHIVE}" ] || { echo "ImageBuilder archive was not generated"; exit 1; }
+          tar -xf "${BUILDER_ARCHIVE}"
+          BUILDER_DIR=$(find . -maxdepth 1 -mindepth 1 -type d -name '*imagebuilder*-x86-64.Linux-x86_64' -printf '%f\n' -quit)
           [ -n "${BUILDER_DIR}" ] || { echo "ImageBuilder directory not found"; exit 1; }
-          echo "BUILDER_DIR=${BUILDER_DIR}" >> $GITHUB_ENV
+          echo "BUILDER_DIR=$PWD/${BUILDER_DIR}" >> $GITHUB_ENV
           echo "Image Builder ready: ${BUILDER_DIR}"
 
       - name: Prepare Custom Files (Optional)
@@ -161,7 +138,7 @@ jobs:
             echo "name=OpenWrt x86_64 ${{ github.ref_name }}" >> $GITHUB_OUTPUT
           else
             echo "tag=openwrt-x86_64-${{ env.BUILD_DATE }}" >> $GITHUB_OUTPUT
-            echo "name=OpenWrt x86_64 ${{ github.event.inputs.openwrt_version }}-${{ env.BUILD_DATE }}" >> $GITHUB_OUTPUT
+            echo "name=OpenWrt x86_64 ImageBuilder-${{ env.BUILD_DATE }}" >> $GITHUB_OUTPUT
           fi
 
       - name: Create Release

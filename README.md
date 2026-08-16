@@ -14,10 +14,10 @@
 `custom_packages`。在 `.config` 中添加软件包后，手动触发
 `Build OpenWrt x86_64 (ImageBuilder)` 工作流即可生效。
 
-默认使用本项目 `Cloud OpenWrt` 工作流发布的最新自定义 ImageBuilder，其中
-包含 `script.sh` 拉取并编译的第三方插件。首次使用前先运行一次 `Cloud OpenWrt`，
-完成后手动触发 `Build OpenWrt x86_64 (ImageBuilder)`。选择 `official` 来源时仅能
-使用官方软件源中的包；`*_INCLUDE_*` 等插件内部功能选项会被忽略。
+`Build OpenWrt x86_64 (ImageBuilder)` 工作流会独立拉取源码，执行 `script.sh` 和
+`config.sh`，编译第三方插件及独立 ImageBuilder，然后继续生成最终固件。
+`Cloud OpenWrt` 仍可单独用于完整源码固件构建；`*_INCLUDE_*` 等插件内部功能选项
+会被忽略。
 
 ![X86_OpenWRT.png](https://s2.loli.net/2022/05/07/8zrTcZfHqMCGVbo.png)
 
