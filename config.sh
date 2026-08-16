@@ -189,3 +189,8 @@ CONFIG_boost-static-and-shared-libs=y
 CONFIG_boost-variant-release=y
 # CONFIG_PACKAGE_kmod-inet-diag is not set
 EOF
+
+# Compile packages selected by the ImageBuilder package configuration too.
+if [ -f ../.config ]; then
+    awk -F= '/^CONFIG_PACKAGE_[a-zA-Z0-9][a-zA-Z0-9_.+-]*=y$/ { sub(/^CONFIG_PACKAGE_/, "", $1); if ($1 !~ /_INCLUDE_/) print "CONFIG_PACKAGE_" $1 "=y" }' ../.config >> .config
+fi

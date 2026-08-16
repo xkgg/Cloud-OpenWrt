@@ -87,11 +87,11 @@ jobs:
           if [ "${SOURCE}" = "custom" ]; then
             TAG="${{ github.event.inputs.imagebuilder_tag }}"
             if [ "${TAG}" = "latest" ]; then
-              RELEASE_URL="https://api.github.com/repos/${{ github.repository }}/releases/latest"
+              ASSET_URL="$(curl -fsSL -H "Authorization: Bearer ${GITHUB_TOKEN}" "https://api.github.com/repos/${{ github.repository }}/releases?per_page=100" | jq -r '[.[] | .assets[] | select(.name | test("imagebuilder.*\\.tar\\.zst$"; "i"))] | .[0].browser_download_url // empty')"
             else
               RELEASE_URL="https://api.github.com/repos/${{ github.repository }}/releases/tags/${TAG}"
+              ASSET_URL="$(curl -fsSL -H "Authorization: Bearer ${GITHUB_TOKEN}" "${RELEASE_URL}" | jq -r '[.assets[] | select(.name | test("imagebuilder.*\\.tar\\.zst$"; "i"))] | .[0].browser_download_url // empty')"
             fi
-            ASSET_URL="$(curl -fsSL -H "Authorization: Bearer ${GITHUB_TOKEN}" "${RELEASE_URL}" | jq -r '.assets[] | select(.name | test("imagebuilder.*\\.tar\\.zst$"; "i")) | .browser_download_url' | head -n1)"
             [ -n "${ASSET_URL}" ] || { echo "Custom ImageBuilder asset not found"; exit 1; }
             curl -fL -H "Authorization: Bearer ${GITHUB_TOKEN}" "${ASSET_URL}" -o imagebuilder.tar.zst
           else
@@ -125,7 +125,7 @@ jobs:
           # Only package selectors are used; package feature sub-options are ignored.
           CONFIG_FILE="${GITHUB_WORKSPACE}/.config"
           if [ -f "${CONFIG_FILE}" ]; then
-            CONFIG_PACKAGES="$(awk -F= '/^CONFIG_PACKAGE_[a-zA-Z0-9][a-zA-Z0-9+.-]*=y$/ { sub(/^CONFIG_PACKAGE_/, "", $1); printf "%s ", $1 }' "${CONFIG_FILE}")"
+            CONFIG_PACKAGES="$(awk -F= '/^CONFIG_PACKAGE_[a-zA-Z0-9][a-zA-Z0-9_.+-]*=y$/ { sub(/^CONFIG_PACKAGE_/, "", $1); if ($1 !~ /_INCLUDE_/) printf "%s ", $1 }' "${CONFIG_FILE}")"
             PACKAGES="${PACKAGES} ${CONFIG_PACKAGES}"
           fi
 
@@ -140,7 +140,7 @@ jobs:
             PACKAGES="${PACKAGES}" \
             FILES="files" \
             EXTRA_IMAGE_NAME="custom-${{ env.BUILD_DATE }}" \
-            CONFIG_TARGET_ROOTFS_PARTSIZE=2048
+            ROOTFS_PARTSIZE=2048
           echo "✅ Build completed!"
 
       - name: Upload Artifacts
