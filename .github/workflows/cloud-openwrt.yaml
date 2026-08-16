@@ -13,15 +13,6 @@ on:
         default: 'false'
         type: boolean
 
-  push:
-    branches:
-      - main
-    paths:
-      - '.config'
-      - 'README.md'
-      - 'script.sh'
-      - 'config.sh'
-
 env:
   GITHUB_TOKEN: ${{secrets.REPO_TOKEN}}
   
