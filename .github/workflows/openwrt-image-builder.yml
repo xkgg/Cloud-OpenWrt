@@ -62,15 +62,16 @@ jobs:
           
       - name: Build source and ImageBuilder
         run: |
-          git clone --depth 1 "${REPO_URL}" -b "${REPO_BRANCH}" openwrt
-          chmod +x script.sh config.sh
-          ./script.sh
-          cd openwrt
+          cd "${GITHUB_WORKSPACE}"
+          git clone --depth 1 "${REPO_URL}" -b "${REPO_BRANCH}" "${GITHUB_WORKSPACE}/openwrt"
+          chmod +x "${GITHUB_WORKSPACE}/script.sh" "${GITHUB_WORKSPACE}/config.sh"
+          "${GITHUB_WORKSPACE}/script.sh"
+          cd "${GITHUB_WORKSPACE}/openwrt"
           ./scripts/feeds update -a
           ./scripts/feeds install -a
-          cd ..
-          ./config.sh
-          cd openwrt
+          cd "${GITHUB_WORKSPACE}"
+          "${GITHUB_WORKSPACE}/config.sh"
+          cd "${GITHUB_WORKSPACE}/openwrt"
           make defconfig
           make download -j8
           find dl -size -1024c -exec rm -f {} \;
