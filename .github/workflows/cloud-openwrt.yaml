@@ -14,7 +14,7 @@ on:
         type: boolean
 
   
-  push:
+
     branches:
       - main
     paths:
