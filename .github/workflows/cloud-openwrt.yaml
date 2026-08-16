@@ -77,7 +77,7 @@ jobs:
         root-reserve-mb: 1024
         
     - name: 将库文件迁移到运行器
-      uses: actions/checkout@main
+      uses: actions/checkout@v7
       
 #    - name: 检测文件和对比上游版本
 #      run: |

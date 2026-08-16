@@ -51,7 +51,9 @@ jobs:
           sudo -E apt-get -y install $(curl -fsSL is.gd/depends_ubuntu_2204)
             
       - name: Checkout
-        uses: actions/checkout@main
+        uses: actions/checkout@v7
+        with:
+          path: repo
         
       - name: 合并磁盘 Disks
         uses: easimon/maximize-build-space@master
@@ -62,15 +64,17 @@ jobs:
           
       - name: Build source and ImageBuilder
         run: |
+          REPO_DIR="${GITHUB_WORKSPACE}/repo"
+          [ -f "${REPO_DIR}/script.sh" ] && [ -f "${REPO_DIR}/config.sh" ] || { echo "Repository scripts were not checked out"; exit 1; }
           cd "${GITHUB_WORKSPACE}"
           git clone --depth 1 "${REPO_URL}" -b "${REPO_BRANCH}" "${GITHUB_WORKSPACE}/openwrt"
-          chmod +x "${GITHUB_WORKSPACE}/script.sh" "${GITHUB_WORKSPACE}/config.sh"
-          "${GITHUB_WORKSPACE}/script.sh"
+          chmod +x "${REPO_DIR}/script.sh" "${REPO_DIR}/config.sh"
+          "${REPO_DIR}/script.sh"
           cd "${GITHUB_WORKSPACE}/openwrt"
           ./scripts/feeds update -a
           ./scripts/feeds install -a
           cd "${GITHUB_WORKSPACE}"
-          "${GITHUB_WORKSPACE}/config.sh"
+          CONFIG_SOURCE="${REPO_DIR}/.config" "${REPO_DIR}/config.sh"
           cd "${GITHUB_WORKSPACE}/openwrt"
           make defconfig
           make download -j8
@@ -88,8 +92,8 @@ jobs:
       - name: Prepare Custom Files (Optional)
         run: |
           # 如果有自定义文件（如默认配置、脚本等），放到仓库的 files/ 目录下
-          if [ -d "files" ]; then
-            cp -rf files/* "${{ env.BUILDER_DIR }}/files/" 2>/dev/null || true
+          if [ -d "${GITHUB_WORKSPACE}/repo/files" ]; then
+            cp -rf "${GITHUB_WORKSPACE}/repo/files/"* "${{ env.BUILDER_DIR }}/files/" 2>/dev/null || true
             echo "✅ Custom files copied"
           fi
 
@@ -101,7 +105,7 @@ jobs:
 
           # Read additional packages from the repository-level .config file.
           # Only package selectors are used; package feature sub-options are ignored.
-          CONFIG_FILE="${GITHUB_WORKSPACE}/.config"
+          CONFIG_FILE="${GITHUB_WORKSPACE}/repo/.config"
           if [ -f "${CONFIG_FILE}" ]; then
             CONFIG_PACKAGES="$(awk -F= '/^CONFIG_PACKAGE_[a-zA-Z0-9][a-zA-Z0-9_.+-]*=y$/ { sub(/^CONFIG_PACKAGE_/, "", $1); if ($1 !~ /_INCLUDE_/) printf "%s ", $1 }' "${CONFIG_FILE}")"
             PACKAGES="${PACKAGES} ${CONFIG_PACKAGES}"
