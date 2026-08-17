@@ -190,8 +190,8 @@ CONFIG_boost-variant-release=y
 # CONFIG_PACKAGE_kmod-inet-diag is not set
 EOF
 
-# Compile packages selected by the ImageBuilder package configuration too.
+# Let the repository .config override the shared source-build defaults.
 CONFIG_SOURCE="${CONFIG_SOURCE:-../.config}"
 if [ -f "${CONFIG_SOURCE}" ]; then
-    awk -F= '/^CONFIG_PACKAGE_[a-zA-Z0-9][a-zA-Z0-9_.+-]*=y$/ { sub(/^CONFIG_PACKAGE_/, "", $1); if ($1 !~ /_INCLUDE_/) print "CONFIG_PACKAGE_" $1 "=y" }' "${CONFIG_SOURCE}" >> .config
+    cat "${CONFIG_SOURCE}" >> .config
 fi

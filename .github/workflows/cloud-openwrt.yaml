@@ -87,8 +87,6 @@ jobs:
 
     - name: 更新 feeds
       run: |
-        chmod +x $SCRIPT_SH
-        ./$SCRIPT_SH
         cd openwrt
         #sed -i 's/#src-git helloworld/src-git helloworld/g' ./feeds.conf.default
         ./scripts/feeds update -a
@@ -97,6 +95,9 @@ jobs:
       run: |
         cd openwrt
         ./scripts/feeds install -a
+        cd "$GITHUB_WORKSPACE"
+        chmod +x $SCRIPT_SH
+        ./$SCRIPT_SH
 
     - name: SSH远程连接（make menuconfig）
 #      if: env.SSH_ACTION == 'true'

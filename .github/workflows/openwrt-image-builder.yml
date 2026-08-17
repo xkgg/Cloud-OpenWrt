@@ -22,12 +22,6 @@ on:
          kmod-dwmac-intel kmod-forcedeth kmod-fs-vfat kmod-tg3 kmod-drm-i915
 
         
-      include_docker:
-        description: 'Include Docker?'
-        type: boolean
-        default: false
-
-
 env:
   TZ: Asia/Shanghai
   REPO_URL: https://github.com/coolsnowwolf/lede
@@ -35,6 +29,7 @@ env:
 
 permissions:
   contents: write
+  actions: write
 
 jobs:
   build:
@@ -68,12 +63,12 @@ jobs:
           [ -f "${REPO_DIR}/script.sh" ] && [ -f "${REPO_DIR}/config.sh" ] || { echo "Repository scripts were not checked out"; exit 1; }
           cd "${GITHUB_WORKSPACE}"
           git clone --depth 1 "${REPO_URL}" -b "${REPO_BRANCH}" "${GITHUB_WORKSPACE}/openwrt"
-          chmod +x "${REPO_DIR}/script.sh" "${REPO_DIR}/config.sh"
-          "${REPO_DIR}/script.sh"
           cd "${GITHUB_WORKSPACE}/openwrt"
           ./scripts/feeds update -a
           ./scripts/feeds install -a
           cd "${GITHUB_WORKSPACE}"
+          chmod +x "${REPO_DIR}/script.sh" "${REPO_DIR}/config.sh"
+          "${REPO_DIR}/script.sh"
           CONFIG_SOURCE="${REPO_DIR}/.config" "${REPO_DIR}/config.sh"
           cd "${GITHUB_WORKSPACE}/openwrt"
           make defconfig
@@ -109,11 +104,6 @@ jobs:
           if [ -f "${CONFIG_FILE}" ]; then
             CONFIG_PACKAGES="$(awk -F= '/^CONFIG_PACKAGE_[a-zA-Z0-9][a-zA-Z0-9_.+-]*=y$/ { sub(/^CONFIG_PACKAGE_/, "", $1); if ($1 !~ /_INCLUDE_/) printf "%s ", $1 }' "${CONFIG_FILE}")"
             PACKAGES="${PACKAGES} ${CONFIG_PACKAGES}"
-          fi
-
-          # 如果勾选了 Docker，追加相关包
-          if [ "${{ github.event.inputs.include_docker }}" == "true" ]; then
-            PACKAGES="${PACKAGES} docker dockerd luci-app-dockerd"
           fi
 
           echo "📦 Installing packages: ${PACKAGES}"
