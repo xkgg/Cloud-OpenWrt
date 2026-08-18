@@ -24,8 +24,8 @@ on:
         
 env:
   TZ: Asia/Shanghai
-  REPO_URL: https://github.com/coolsnowwolf/lede
-  REPO_BRANCH: master
+  REPO_URL: https://github.com/openwrt/openwrt
+  REPO_BRANCH: v24.10.8
 
 permissions:
   contents: write
@@ -64,9 +64,7 @@ jobs:
           cd "${GITHUB_WORKSPACE}"
           git clone --depth 1 "${REPO_URL}" -b "${REPO_BRANCH}" "${GITHUB_WORKSPACE}/openwrt"
           cd "${GITHUB_WORKSPACE}/openwrt"
-          echo 'src-git smpackage https://github.com/kenzok8/small-package.git;main' >> feeds.conf.default
           ./scripts/feeds update -a
-          rm -rf feeds/packages/utils/docker feeds/packages/utils/dockerd
           ./scripts/feeds install -a
           cd "${GITHUB_WORKSPACE}"
           chmod +x "${REPO_DIR}/script.sh" "${REPO_DIR}/config.sh"

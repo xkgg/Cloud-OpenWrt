@@ -1,5 +1,20 @@
 #!/bin/bash
 cd openwrt
+mkdir -p package/lean
+
+# The hosted runner has runc but not Docker's other nested binaries.
+# OpenWrt packages those dependencies separately, so do not copy host tools.
+mkdir -p feeds/packages/utils/dockerd/patches
+cat > feeds/packages/utils/dockerd/patches/999-skip-host-binaries.patch <<'EOF'
+--- a/hack/make/binary-daemon
++++ b/hack/make/binary-daemon
+@@ -4,1 +4,4 @@
+ copy_binaries() {
++	# OpenWrt packages containerd, runc, and tini separately.
++	return
++
+EOF
+
 # Add luci-app-adguardhome
 git clone https://github.com/rufengsuixing/luci-app-adguardhome.git package-temp
 mv -f package-temp/luci-app-adguardhome package/lean/
