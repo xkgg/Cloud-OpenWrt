@@ -88,12 +88,14 @@ jobs:
     - name: 更新 feeds
       run: |
         cd openwrt
+        echo 'src-git smpackage https://github.com/kenzok8/small-package.git;main' >> feeds.conf.default
         #sed -i 's/#src-git helloworld/src-git helloworld/g' ./feeds.conf.default
         ./scripts/feeds update -a
 
     - name: 安装 feeds
       run: |
         cd openwrt
+        rm -rf feeds/packages/utils/docker feeds/packages/utils/dockerd
         ./scripts/feeds install -a
         cd "$GITHUB_WORKSPACE"
         chmod +x $SCRIPT_SH
