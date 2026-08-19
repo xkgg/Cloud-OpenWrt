@@ -98,13 +98,12 @@ jobs:
 
           PACKAGES="${{ github.event.inputs.custom_packages }}"
 
-          # Read additional packages from the repository-level .config file.
-          # Only package selectors are used; package feature sub-options are ignored.
-          CONFIG_FILE="${GITHUB_WORKSPACE}/repo/.config"
-          if [ -f "${CONFIG_FILE}" ]; then
-            CONFIG_PACKAGES="$(awk -F= '/^CONFIG_PACKAGE_[a-zA-Z0-9][a-zA-Z0-9_.+-]*=y$/ { sub(/^CONFIG_PACKAGE_/, "", $1); if ($1 !~ /_INCLUDE_/) printf "%s ", $1 }' "${CONFIG_FILE}")"
-            PACKAGES="${PACKAGES} ${CONFIG_PACKAGES}"
-          fi
+          # Use the configuration resolved by make defconfig so unavailable
+          # third-party packages are not passed to the ImageBuilder.
+          CONFIG_FILE="${GITHUB_WORKSPACE}/openwrt/.config"
+          [ -f "${CONFIG_FILE}" ] || { echo "Resolved OpenWrt configuration not found"; exit 1; }
+          CONFIG_PACKAGES="$(awk -F= '/^CONFIG_PACKAGE_[a-zA-Z0-9][a-zA-Z0-9_.+-]*=y$/ { sub(/^CONFIG_PACKAGE_/, "", $1); if ($1 !~ /_INCLUDE_/) printf "%s ", $1 }' "${CONFIG_FILE}")"
+          PACKAGES="${PACKAGES} ${CONFIG_PACKAGES}"
 
           echo "📦 Installing packages: ${PACKAGES}"
 
