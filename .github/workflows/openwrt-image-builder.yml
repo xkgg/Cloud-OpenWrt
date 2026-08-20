@@ -11,8 +11,7 @@ on:
          fstools grub2-bios-setup i915-firmware-dmc kmod-8139cp kmod-8139too
          kmod-button-hotplug kmod-e1000e kmod-fs-f2fs kmod-i40e kmod-igb
          kmod-igbvf kmod-igc kmod-ixgbe kmod-ixgbevf kmod-nf-nathelper
-         kmod-nf-nathelper-extra kmod-nft-offload kmod-pcnet32 kmod-r8101
-         kmod-r8125 kmod-r8126 kmod-r8168 kmod-tulip kmod-usb-hid kmod-usb-net
+         kmod-nf-nathelper-extra kmod-nft-offload kmod-pcnet32 kmod-tulip kmod-usb-hid kmod-usb-net
          kmod-usb-net-asix kmod-usb-net-asix-ax88179 kmod-usb-net-rtl8150
          kmod-usb-net-rtl8152 kmod-vmxnet3 libc libgcc -libustream-mbedtls libustream-openssl logd
          luci-app-package-manager luci-compat luci-lib-base luci-lib-ipkg
@@ -88,7 +87,7 @@ jobs:
         run: |
           # 如果有自定义文件（如默认配置、脚本等），放到仓库的 files/ 目录下
           if [ -d "${GITHUB_WORKSPACE}/repo/files" ]; then
-            cp -rf "${GITHUB_WORKSPACE}/repo/files/"* "${{ env.BUILDER_DIR }}/files/" 2>/dev/null || true
+            cp -a "${GITHUB_WORKSPACE}/repo/files/." "${{ env.BUILDER_DIR }}/files/"
             echo "✅ Custom files copied"
           fi
 
@@ -103,7 +102,41 @@ jobs:
           CONFIG_FILE="${GITHUB_WORKSPACE}/openwrt/.config"
           [ -f "${CONFIG_FILE}" ] || { echo "Resolved OpenWrt configuration not found"; exit 1; }
           CONFIG_PACKAGES="$(awk -F= '/^CONFIG_PACKAGE_[a-zA-Z0-9][a-zA-Z0-9_.+-]*=y$/ { sub(/^CONFIG_PACKAGE_/, "", $1); if ($1 !~ /_INCLUDE_/) printf "%s ", $1 }' "${CONFIG_FILE}")"
-          PACKAGES="${PACKAGES} ${CONFIG_PACKAGES}"
+          REQUESTED_PACKAGES="${PACKAGES} ${CONFIG_PACKAGES}"
+
+          # Keep only packages shipped by this ImageBuilder. This prevents
+          # stale Lean-only package names from breaking make image.
+          PACKAGE_INDEX_FILES=()
+          while IFS= read -r -d '' INDEX_FILE; do
+            PACKAGE_INDEX_FILES+=("${INDEX_FILE}")
+          done < <(find packages -type f \( -name 'Packages.manifest' -o -name 'Packages' \) -print0)
+
+          if [ "${#PACKAGE_INDEX_FILES[@]}" -gt 0 ]; then
+            AVAILABLE_PACKAGES="$(awk '
+              /^Package:[[:space:]]/ { print $2 }
+              /^[^[:space:]]+[[:space:]]-[[:space:]]/ { print $1 }
+            ' "${PACKAGE_INDEX_FILES[@]}" | sort -u)"
+          else
+            AVAILABLE_PACKAGES="$(find packages -type f -name '*.ipk' -printf '%f\n' | sed -E 's/_[^_]+_[^_]+\.ipk$//' | sort -u)"
+          fi
+
+          [ -n "${AVAILABLE_PACKAGES}" ] || { echo "ImageBuilder package index not found"; exit 1; }
+
+          VALID_PACKAGES=()
+          SKIPPED_PACKAGES=()
+          for PACKAGE in ${REQUESTED_PACKAGES}; do
+            PACKAGE_NAME="${PACKAGE#-}"
+            if grep -Fqx -- "${PACKAGE_NAME}" <<< "${AVAILABLE_PACKAGES}"; then
+              VALID_PACKAGES+=("${PACKAGE}")
+            else
+              SKIPPED_PACKAGES+=("${PACKAGE}")
+            fi
+          done
+
+          if [ "${#SKIPPED_PACKAGES[@]}" -gt 0 ]; then
+            echo "⚠️ Skipping unavailable packages: ${SKIPPED_PACKAGES[*]}"
+          fi
+          PACKAGES="${VALID_PACKAGES[*]}"
 
           echo "📦 Installing packages: ${PACKAGES}"
 

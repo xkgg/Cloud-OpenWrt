@@ -13,6 +13,7 @@
 配置，再将其中可用的 `CONFIG_PACKAGE_<包名>=y` 转换为 ImageBuilder 的软件包列表并合并到
 `custom_packages`。在 `.config` 中添加软件包后，手动触发
 `Build OpenWrt x86_64 (ImageBuilder)` 工作流即可生效。
+手动输入或配置中不存在于当前 ImageBuilder 的软件包会被提示并跳过。
 
 `Build OpenWrt x86_64 (ImageBuilder)` 工作流会独立拉取源码，执行 `script.sh` 和
 `config.sh`，编译第三方插件及独立 ImageBuilder，然后继续生成最终固件。
