@@ -18,9 +18,7 @@ cat > feeds/packages/utils/dockerd/patches/999-skip-host-binaries.patch <<'EOF'
 EOF
 
 # Add luci-app-adguardhome
-git clone --depth 1 https://github.com/rufengsuixing/luci-app-adguardhome.git package-temp
-mv -f package-temp/luci-app-adguardhome package/lean/
-rm -rf package-temp
+git clone --depth 1 https://github.com/rufengsuixing/luci-app-adguardhome.git package/lean/luci-app-adguardhome
 # Add luci-app-openclash
 git clone --depth 1 https://github.com/vernesong/OpenClash.git package-temp
 mv -f package-temp/luci-app-openclash package/lean/
