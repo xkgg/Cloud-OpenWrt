@@ -40,7 +40,9 @@ jobs:
         run: |
           echo "BUILD_DATE=$(date +%Y%m%d%H%M)" >> $GITHUB_ENV
           sudo -E apt-get update -qq
-          sudo -E apt-get -y install wget curl zstd xz-utils libncurses5-dev libncursesw5-dev
+          sudo -E apt-get -y install \
+            wget curl zstd xz-utils dosfstools mtools qemu-utils \
+            libncurses5-dev libncursesw5-dev
 
       - name: Checkout
         uses: actions/checkout@v7
@@ -92,6 +94,7 @@ jobs:
           mkdir -p "${{ env.BUILDER_DIR }}/files"
           if [ -d "${GITHUB_WORKSPACE}/repo/files" ]; then
             cp -a "${GITHUB_WORKSPACE}/repo/files/." "${{ env.BUILDER_DIR }}/files/"
+            rm -f "${{ env.BUILDER_DIR }}/files/.gitkeep"
             echo "✅ Custom files copied"
           fi
 
@@ -120,7 +123,7 @@ jobs:
           VALID_PACKAGES=()
           SKIPPED_PACKAGES=()
           for PACKAGE in ${PACKAGES}; do
-            # 关键：以 '-' 开头的排除指令（如 -dnsmasq, -libustream-mbedtls）绝不能被过滤掉！
+            # 关键：以 '-' 开头的排除指令（如 -dnsmasq, -libustream-mbedtls）一律保留
             if [[ "${PACKAGE}" == -* ]]; then
               VALID_PACKAGES+=("${PACKAGE}")
               continue
@@ -149,7 +152,9 @@ jobs:
             PACKAGES="${PACKAGES}" \
             FILES="files" \
             EXTRA_IMAGE_NAME="custom-${{ env.BUILD_DATE }}" \
-            ROOTFS_PARTSIZE=2048
+            ROOTFS_PARTSIZE=2048 \
+            CONFIG_TARGET_ROOTFS_PARTSIZE=2048 \
+            V=s
 
           echo "✅ Build completed!"
 
