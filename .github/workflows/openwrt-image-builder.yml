@@ -83,11 +83,11 @@ jobs:
             echo "✅ Local ipk packages copied"
           fi
 
-          # 若存在 script.sh 则以容错模式执行辅助准备脚本
-          if [ -f "${GITHUB_WORKSPACE}/repo/script.sh" ]; then
-            chmod +x "${GITHUB_WORKSPACE}/repo/script.sh"
-            "${GITHUB_WORKSPACE}/repo/script.sh" || echo "⚠️ script.sh exited with warning"
-          fi
+          # 禁用签名校验（允许安装本地未签名的第三方 ipk）
+          sed -i 's/option check_signature/# option check_signature/g' repositories.conf
+
+          # 为 packages 目录生成完整的 Packages 及 Packages.gz 索引
+          (cd packages && ../scripts/ipkg-make-index.sh . > Packages && gzip -9nc Packages > Packages.gz) || true
 
       - name: Prepare Custom Files (Optional)
         run: |
@@ -102,11 +102,11 @@ jobs:
         run: |
           cd "${{ env.BUILDER_DIR }}"
 
-          # 1. 优先索引本地 packages 目录，并更新 ImageBuilder 仓库源索引
-          make package_index 2>/dev/null || true
+          # 确保禁用签名校验并更新软件源
+          sed -i 's/option check_signature/# option check_signature/g' repositories.conf
           make package_reload 2>/dev/null || true
 
-          # 2. 收集所有可用软件包名称（包括远端官方源 + 本地 packages/ 目录）
+          # 收集所有可用软件包名称（包括远端官方源 + 本地 packages/ 目录）
           AVAILABLE_PACKAGES="$(make -s package_list 2>/dev/null | awk '{print $1}' | sort -u)"
           LOCAL_IPKS="$(find packages/ -maxdepth 1 -type f -name '*.ipk' -printf '%f\n' 2>/dev/null | sed -E 's/_[^_]+_[^_]+\.ipk$//' | sort -u)"
           ALL_AVAILABLE="$(echo -e "${AVAILABLE_PACKAGES}\n${LOCAL_IPKS}" | sort -u | grep -v '^$')"
