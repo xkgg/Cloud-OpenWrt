@@ -42,15 +42,8 @@ jobs:
           sudo -E apt-get update -qq
           sudo -E apt-get -y install wget curl zstd xz-utils libncurses5-dev libncursesw5-dev
 
-      - name: 合并磁盘 Disks
-        uses: easimon/maximize-build-space@master
-        with:
-          swap-size-mb: 1024
-          temp-reserve-mb: 100
-          root-reserve-mb: 1024
-
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           path: repo
 
@@ -106,6 +99,15 @@ jobs:
         run: |
           cd "${{ env.BUILDER_DIR }}"
 
+          # 1. 优先索引本地 packages 目录，并更新 ImageBuilder 仓库源索引
+          make package_index 2>/dev/null || true
+          make package_reload 2>/dev/null || true
+
+          # 2. 收集所有可用软件包名称（包括远端官方源 + 本地 packages/ 目录）
+          AVAILABLE_PACKAGES="$(make -s package_list 2>/dev/null | awk '{print $1}' | sort -u)"
+          LOCAL_IPKS="$(find packages/ -maxdepth 1 -type f -name '*.ipk' -printf '%f\n' 2>/dev/null | sed -E 's/_[^_]+_[^_]+\.ipk$//' | sort -u)"
+          ALL_AVAILABLE="$(echo -e "${AVAILABLE_PACKAGES}\n${LOCAL_IPKS}" | sort -u | grep -v '^$')"
+
           PACKAGES="${{ github.event.inputs.custom_packages }}"
 
           # 从仓库 .config 读取额外配置的包
@@ -115,42 +117,32 @@ jobs:
             PACKAGES="${PACKAGES} ${CONFIG_PACKAGES}"
           fi
 
-          # 过滤并检查包可用性（匹配 Packages 索引或 packages/*.ipk）
-          PACKAGE_INDEX_FILES=()
-          while IFS= read -r -d '' INDEX_FILE; do
-            PACKAGE_INDEX_FILES+=("${INDEX_FILE}")
-          done < <(find packages -type f \( -name 'Packages.manifest' -o -name 'Packages' \) -print0)
-
-          if [ "${#PACKAGE_INDEX_FILES[@]}" -gt 0 ]; then
-            AVAILABLE_PACKAGES="$(awk '
-              /^Package:[[:space:]]/ { print $2 }
-              /^[^[:space:]]+[[:space:]]-[[:space:]]/ { print $1 }
-            ' "${PACKAGE_INDEX_FILES[@]}" | sort -u)"
-          else
-            AVAILABLE_PACKAGES="$(find packages -type f -name '*.ipk' -printf '%f\n' | sed -E 's/_[^_]+_[^_]+\.ipk$//' | sort -u)"
-          fi
-
           VALID_PACKAGES=()
           SKIPPED_PACKAGES=()
           for PACKAGE in ${PACKAGES}; do
-            PACKAGE_NAME="${PACKAGE#-}"
-            if [ -n "${AVAILABLE_PACKAGES}" ] && grep -Fqx -- "${PACKAGE_NAME}" <<< "${AVAILABLE_PACKAGES}"; then
+            # 关键：以 '-' 开头的排除指令（如 -dnsmasq, -libustream-mbedtls）绝不能被过滤掉！
+            if [[ "${PACKAGE}" == -* ]]; then
               VALID_PACKAGES+=("${PACKAGE}")
-            else
-              # 对第三方放入 packages/*.ipk 的包做兼容保留
-              if ls packages/*"${PACKAGE_NAME}"*.ipk >/dev/null 2>&1; then
+              continue
+            fi
+
+            # 如果成功获取到了可用包清单，则校验包名
+            if [ -n "${ALL_AVAILABLE}" ]; then
+              if grep -Fqx -- "${PACKAGE}" <<< "${ALL_AVAILABLE}"; then
                 VALID_PACKAGES+=("${PACKAGE}")
               else
                 SKIPPED_PACKAGES+=("${PACKAGE}")
               fi
+            else
+              VALID_PACKAGES+=("${PACKAGE}")
             fi
           done
 
           if [ "${#SKIPPED_PACKAGES[@]}" -gt 0 ]; then
             echo "⚠️ Skipping unavailable packages: ${SKIPPED_PACKAGES[*]}"
           fi
-          PACKAGES="${VALID_PACKAGES[*]}"
 
+          PACKAGES="${VALID_PACKAGES[*]}"
           echo "📦 Installing packages: ${PACKAGES}"
 
           make image \
@@ -168,7 +160,7 @@ jobs:
           ls -lh
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: OpenWrt-x86_64-${{ env.BUILD_DATE }}
           path: |
