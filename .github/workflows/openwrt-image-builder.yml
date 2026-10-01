@@ -3,28 +3,29 @@ name: Build OpenWrt x86_64 (ImageBuilder)
 on:
   workflow_dispatch:
     inputs:
+      openwrt_version:
+        description: 'OpenWrt Version (官方发行版本号)'
+        required: true
+        default: '24.10.8'
       custom_packages:
-        description: 'Custom Packages (space separated)'
+        description: 'Custom Packages (自定义软件包，空格分隔)'
         required: false
         default: >-
-         base-files block-mount ca-bundle  -dnsmasq dnsmasq-full dropbear fdisk firewall4
-         fstools grub2-bios-setup i915-firmware-dmc kmod-8139cp kmod-8139too
-         kmod-button-hotplug kmod-e1000e kmod-fs-f2fs kmod-i40e kmod-igb
-         kmod-igbvf kmod-igc kmod-ixgbe kmod-ixgbevf kmod-nf-nathelper
-         kmod-nf-nathelper-extra kmod-nft-offload kmod-pcnet32 kmod-tulip kmod-usb-hid kmod-usb-net
-         kmod-usb-net-asix kmod-usb-net-asix-ax88179 kmod-usb-net-rtl8150
-         kmod-usb-net-rtl8152 kmod-vmxnet3 libc libgcc -libustream-mbedtls libustream-openssl logd
-         luci-app-package-manager luci-compat luci-lib-base luci-lib-ipkg
-         luci-light mkf2fs mtd netifd nftables odhcp6c odhcpd-ipv6only opkg
-         partx-utils ppp ppp-mod-pppoe procd-ujail uci uclient-fetch
-         urandom-seed urngd kmod-amazon-ena kmod-amd-xgbe kmod-bnx2 kmod-e1000
-         kmod-dwmac-intel kmod-forcedeth kmod-fs-vfat kmod-tg3 kmod-drm-i915
+          base-files block-mount ca-bundle -dnsmasq dnsmasq-full dropbear fdisk firewall4
+          fstools grub2-bios-setup i915-firmware-dmc kmod-8139cp kmod-8139too
+          kmod-button-hotplug kmod-e1000e kmod-fs-f2fs kmod-i40e kmod-igb
+          kmod-igbvf kmod-igc kmod-ixgbe kmod-ixgbevf kmod-nf-nathelper
+          kmod-nf-nathelper-extra kmod-nft-offload kmod-pcnet32 kmod-tulip kmod-usb-hid kmod-usb-net
+          kmod-usb-net-asix kmod-usb-net-asix-ax88179 kmod-usb-net-rtl8150
+          kmod-usb-net-rtl8152 kmod-vmxnet3 libc libgcc -libustream-mbedtls libustream-openssl logd
+          luci-app-package-manager luci-compat luci-lib-base luci-lib-ipkg
+          luci-light mkf2fs mtd netifd nftables odhcp6c odhcpd-ipv6only opkg
+          partx-utils ppp ppp-mod-pppoe procd-ujail uci uclient-fetch
+          urandom-seed urngd kmod-amazon-ena kmod-amd-xgbe kmod-bnx2 kmod-e1000
+          kmod-dwmac-intel kmod-forcedeth kmod-fs-vfat kmod-tg3 kmod-drm-i915
 
-        
 env:
   TZ: Asia/Shanghai
-  REPO_URL: https://github.com/openwrt/openwrt
-  REPO_BRANCH: v24.10.8
 
 permissions:
   contents: write
@@ -35,15 +36,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
- 
-
-
       - name: Initialize Environment
         run: |
           echo "BUILD_DATE=$(date +%Y%m%d%H%M)" >> $GITHUB_ENV
-          sudo -E apt-get update
-          sudo -E apt-get -y install $(curl -fsSL is.gd/depends_ubuntu_2204)
-            
+          sudo -E apt-get update -qq
+          sudo -E apt-get -y install wget curl zstd xz-utils libncurses5-dev libncursesw5-dev
+
       - name: 合并磁盘 Disks
         uses: easimon/maximize-build-space@master
         with:
@@ -52,40 +50,53 @@ jobs:
           root-reserve-mb: 1024
 
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@v4
         with:
           path: repo
-          
-      - name: Build source and ImageBuilder
-        run: |
-          REPO_DIR="${GITHUB_WORKSPACE}/repo"
-          [ -f "${REPO_DIR}/script.sh" ] && [ -f "${REPO_DIR}/config.sh" ] || { echo "Repository scripts were not checked out"; exit 1; }
-          cd "${GITHUB_WORKSPACE}"
-          git clone --depth 1 "${REPO_URL}" -b "${REPO_BRANCH}" "${GITHUB_WORKSPACE}/openwrt"
-          cd "${GITHUB_WORKSPACE}/openwrt"
-          ./scripts/feeds update -a
-          ./scripts/feeds install -a
-          cd "${GITHUB_WORKSPACE}"
-          chmod +x "${REPO_DIR}/script.sh" "${REPO_DIR}/config.sh"
-          "${REPO_DIR}/script.sh"
-          CONFIG_SOURCE="${REPO_DIR}/.config" "${REPO_DIR}/config.sh"
-          cd "${GITHUB_WORKSPACE}/openwrt"
-          make defconfig
-          make download -j8
-          find dl -size -1024c -exec rm -f {} \;
-          make -j$(nproc) || make -j1 V=s
 
-          BUILDER_ARCHIVE=$(find bin/targets/x86/64 -maxdepth 1 -type f -name '*imagebuilder*.tar.zst' -print -quit)
-          [ -n "${BUILDER_ARCHIVE}" ] || { echo "ImageBuilder archive was not generated"; exit 1; }
+      - name: Download Official ImageBuilder
+        run: |
+          VERSION="${{ github.event.inputs.openwrt_version }}"
+          BUILDER_ARCHIVE="openwrt-imagebuilder-${VERSION}-x86-64.Linux-x86_64.tar.zst"
+          BUILDER_URL="https://downloads.openwrt.org/releases/${VERSION}/targets/x86/64/${BUILDER_ARCHIVE}"
+          echo "Downloading: ${BUILDER_URL}"
+          wget -q --show-progress "${BUILDER_URL}" -O "${BUILDER_ARCHIVE}" || {
+            echo "Failed to download ImageBuilder for version ${VERSION}"
+            exit 1
+          }
           tar -xf "${BUILDER_ARCHIVE}"
-          BUILDER_DIR=$(find . -maxdepth 1 -mindepth 1 -type d -name '*imagebuilder*-x86-64.Linux-x86_64' -printf '%f\n' -quit)
+          BUILDER_DIR=$(find . -maxdepth 1 -mindepth 1 -type d -name "openwrt-imagebuilder-*-x86-64.Linux-x86_64" -printf '%f\n' -quit)
           [ -n "${BUILDER_DIR}" ] || { echo "ImageBuilder directory not found"; exit 1; }
-          echo "BUILDER_DIR=$PWD/${BUILDER_DIR}" >> $GITHUB_ENV
+          echo "BUILDER_DIR=${GITHUB_WORKSPACE}/${BUILDER_DIR}" >> $GITHUB_ENV
           echo "Image Builder ready: ${BUILDER_DIR}"
+
+      - name: Prepare Third-party Packages (Optional)
+        run: |
+          cd "${{ env.BUILDER_DIR }}"
+          mkdir -p packages
+
+          # 自动获取 OpenClash 最新版 ipk
+          OPENCLASH_URL=$(curl -fsSL https://api.github.com/repos/vernesong/OpenClash/releases/latest 2>/dev/null | grep -o 'https://[^"]*luci-app-openclash[^"]*\.ipk' | head -n 1 || true)
+          if [ -n "${OPENCLASH_URL}" ]; then
+            echo "Downloading OpenClash from: ${OPENCLASH_URL}"
+            wget -q "${OPENCLASH_URL}" -P packages/ || true
+          fi
+
+          # 复制仓库 packages 目录下的本地 ipk（如有）
+          if [ -d "${GITHUB_WORKSPACE}/repo/packages" ]; then
+            cp -rf "${GITHUB_WORKSPACE}/repo/packages/"*.ipk packages/ 2>/dev/null || true
+            echo "✅ Local ipk packages copied"
+          fi
+
+          # 若存在 script.sh 则以容错模式执行辅助准备脚本
+          if [ -f "${GITHUB_WORKSPACE}/repo/script.sh" ]; then
+            chmod +x "${GITHUB_WORKSPACE}/repo/script.sh"
+            "${GITHUB_WORKSPACE}/repo/script.sh" || echo "⚠️ script.sh exited with warning"
+          fi
 
       - name: Prepare Custom Files (Optional)
         run: |
-          # 如果有自定义文件（如默认配置、脚本等），放到仓库的 files/ 目录下
+          mkdir -p "${{ env.BUILDER_DIR }}/files"
           if [ -d "${GITHUB_WORKSPACE}/repo/files" ]; then
             cp -a "${GITHUB_WORKSPACE}/repo/files/." "${{ env.BUILDER_DIR }}/files/"
             echo "✅ Custom files copied"
@@ -97,15 +108,14 @@ jobs:
 
           PACKAGES="${{ github.event.inputs.custom_packages }}"
 
-          # Use the configuration resolved by make defconfig so unavailable
-          # third-party packages are not passed to the ImageBuilder.
-          CONFIG_FILE="${GITHUB_WORKSPACE}/openwrt/.config"
-          [ -f "${CONFIG_FILE}" ] || { echo "Resolved OpenWrt configuration not found"; exit 1; }
-          CONFIG_PACKAGES="$(awk -F= '/^CONFIG_PACKAGE_[a-zA-Z0-9][a-zA-Z0-9_.+-]*=y$/ { sub(/^CONFIG_PACKAGE_/, "", $1); if ($1 !~ /_INCLUDE_/) printf "%s ", $1 }' "${CONFIG_FILE}")"
-          REQUESTED_PACKAGES="${PACKAGES} ${CONFIG_PACKAGES}"
+          # 从仓库 .config 读取额外配置的包
+          CONFIG_FILE="${GITHUB_WORKSPACE}/repo/.config"
+          if [ -f "${CONFIG_FILE}" ]; then
+            CONFIG_PACKAGES="$(awk -F= '/^CONFIG_PACKAGE_[a-zA-Z0-9][a-zA-Z0-9_.+-]*=y$/ { sub(/^CONFIG_PACKAGE_/, "", $1); if ($1 !~ /_INCLUDE_/) printf "%s ", $1 }' "${CONFIG_FILE}")"
+            PACKAGES="${PACKAGES} ${CONFIG_PACKAGES}"
+          fi
 
-          # Keep only packages shipped by this ImageBuilder. This prevents
-          # stale Lean-only package names from breaking make image.
+          # 过滤并检查包可用性（匹配 Packages 索引或 packages/*.ipk）
           PACKAGE_INDEX_FILES=()
           while IFS= read -r -d '' INDEX_FILE; do
             PACKAGE_INDEX_FILES+=("${INDEX_FILE}")
@@ -120,16 +130,19 @@ jobs:
             AVAILABLE_PACKAGES="$(find packages -type f -name '*.ipk' -printf '%f\n' | sed -E 's/_[^_]+_[^_]+\.ipk$//' | sort -u)"
           fi
 
-          [ -n "${AVAILABLE_PACKAGES}" ] || { echo "ImageBuilder package index not found"; exit 1; }
-
           VALID_PACKAGES=()
           SKIPPED_PACKAGES=()
-          for PACKAGE in ${REQUESTED_PACKAGES}; do
+          for PACKAGE in ${PACKAGES}; do
             PACKAGE_NAME="${PACKAGE#-}"
-            if grep -Fqx -- "${PACKAGE_NAME}" <<< "${AVAILABLE_PACKAGES}"; then
+            if [ -n "${AVAILABLE_PACKAGES}" ] && grep -Fqx -- "${PACKAGE_NAME}" <<< "${AVAILABLE_PACKAGES}"; then
               VALID_PACKAGES+=("${PACKAGE}")
             else
-              SKIPPED_PACKAGES+=("${PACKAGE}")
+              # 对第三方放入 packages/*.ipk 的包做兼容保留
+              if ls packages/*"${PACKAGE_NAME}"*.ipk >/dev/null 2>&1; then
+                VALID_PACKAGES+=("${PACKAGE}")
+              else
+                SKIPPED_PACKAGES+=("${PACKAGE}")
+              fi
             fi
           done
 
@@ -145,47 +158,50 @@ jobs:
             FILES="files" \
             EXTRA_IMAGE_NAME="custom-${{ env.BUILD_DATE }}" \
             ROOTFS_PARTSIZE=2048
+
           echo "✅ Build completed!"
 
+      - name: Generate Checksums & Organize Files
+        run: |
+          cd "${{ env.BUILDER_DIR }}/bin/targets/x86/64"
+          sha256sum *.img.gz > sha256sums 2>/dev/null || true
+          ls -lh
+
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v4
         with:
           name: OpenWrt-x86_64-${{ env.BUILD_DATE }}
           path: |
             ${{ env.BUILDER_DIR }}/bin/targets/x86/64/*.img.gz
-            ${{ env.BUILDER_DIR }}/bin/targets/x86/64/*.efi.gz
             ${{ env.BUILDER_DIR }}/bin/targets/x86/64/*.manifest
+            ${{ env.BUILDER_DIR }}/bin/targets/x86/64/sha256sums
           retention-days: 7
 
       - name: Set Release Tag
         id: release_tag
         run: |
-          if [[ "${{ github.event_name }}" == "push" ]]; then
-            echo "tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
-            echo "name=OpenWrt x86_64 ${{ github.ref_name }}" >> $GITHUB_OUTPUT
-          else
-            echo "tag=openwrt-x86_64-${{ env.BUILD_DATE }}" >> $GITHUB_OUTPUT
-            echo "name=OpenWrt x86_64 ImageBuilder-${{ env.BUILD_DATE }}" >> $GITHUB_OUTPUT
-          fi
+          echo "tag=openwrt-x86_64-${{ env.BUILD_DATE }}" >> $GITHUB_OUTPUT
+          echo "name=OpenWrt x86_64 ImageBuilder-${{ env.BUILD_DATE }}" >> $GITHUB_OUTPUT
 
       - name: Create Release
         if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v3
+        uses: softprops/action-gh-release@v2
         with:
           files: |
             ${{ env.BUILDER_DIR }}/bin/targets/x86/64/*.img.gz
-            ${{ env.BUILDER_DIR }}/bin/targets/x86/64/*.efi.gz
+            ${{ env.BUILDER_DIR }}/bin/targets/x86/64/sha256sums
+            ${{ env.BUILDER_DIR }}/bin/targets/x86/64/*.manifest
           tag_name: ${{ steps.release_tag.outputs.tag }}
           name: ${{ steps.release_tag.outputs.name }}
           draft: false
           prerelease: false
-          
+
       - name: Remove old Releases
         uses: ophub/delete-releases-workflows@main
         with:
-          delete_releases: true  #Whether to delete Releases (options: true/false). Default: false.是否删除 Releases（选项：true/false），默认为 false
+          delete_releases: true
           releases_keep_latest: 3
           delete_tags: true
           delete_workflows: true
           workflows_keep_day: 3
-          gh_token: ${{ secrets.GITHUB_TOKEN }}   
+          gh_token: ${{ secrets.GITHUB_TOKEN }}
